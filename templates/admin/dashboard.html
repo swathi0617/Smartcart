@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(90deg, #4facfe, #00c6ff);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .logout {
+            background: red;
+        }
+
+        .logout:hover {
+            background: darkred;
+        }
+
+        /* Content */
+        .container {
+            padding: 30px;
+        }
+
+        .welcome {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .msg {
+            color: green;
+            margin-bottom: 15px;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2>Admin Dashboard</h2>
+
+    <div class="nav-links">
+        <a href="/admin/add-item">Add Product</a>
+        <a href="/admin/item-list">View Products</a>
+        <a href="/admin/profile">Profile</a>
+        <a class="logout" href="/admin-logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <p class="msg">{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="box">
+        <div class="welcome">
+            Welcome, {{ admin_name }}
+        </div>
+
+        <p>This is your admin control panel.</p>
+    </div>
+
+</div>
+
+</body>
+</html>

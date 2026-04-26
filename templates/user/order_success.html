@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Successful</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#eef2ff,#f8fafc);
+    color:#0f172a;
+    display:flex;
+    flex-direction:column;
+}
+
+/* NAVBAR */
+.navbar{
+    width:100%;
+    background:#0f172a;
+    padding:14px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:9999;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.logo span{
+    color:#fb923c;
+}
+
+#menu-toggle{
+    display:none;
+}
+
+.menu-icon{
+    display:none;
+    font-size:28px;
+    color:#fff;
+    cursor:pointer;
+}
+
+.nav-links{
+    display:flex;
+    gap:10px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.nav-links a:hover,
+.active-btn{
+    background:#f97316;
+}
+
+/* MAIN */
+.main-content{
+    flex:1;
+    padding:35px 20px;
+}
+
+.success-container{
+    max-width:900px;
+    width:100%;
+    margin:auto;
+    background:#fff;
+    padding:30px;
+    border-radius:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.12);
+}
+
+.success-icon{
+    width:80px;
+    height:80px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:#16a34a;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:38px;
+}
+
+.heading{
+    text-align:center;
+}
+
+.heading h2{
+    color:#16a34a;
+    font-size:30px;
+    margin-bottom:10px;
+}
+
+.heading p{
+    color:#475569;
+    font-size:16px;
+}
+
+.order-details{
+    margin-top:25px;
+    background:#f8fafc;
+    padding:20px;
+    border-radius:16px;
+    border:1px solid #e2e8f0;
+}
+
+.order-details p{
+    margin-bottom:12px;
+    color:#334155;
+    line-height:1.6;
+    font-size:16px;
+}
+
+.order-details strong{
+    color:#0f172a;
+}
+
+.items-list{
+    margin-top:28px;
+}
+
+.items-list h3{
+    margin-bottom:14px;
+    color:#0f172a;
+    font-size:22px;
+}
+
+/* DESKTOP TABLE */
+.table-box{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#0f172a;
+    color:#fff;
+    padding:13px;
+    text-align:center;
+}
+
+td{
+    padding:13px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:center;
+    color:#334155;
+}
+
+.product-cell{
+    text-align:left;
+    font-weight:bold;
+}
+
+/* MOBILE CART STYLE */
+.mobile-items{
+    display:none;
+}
+
+.mobile-card{
+    background:#fff;
+    border-radius:18px;
+    padding:14px;
+    margin-bottom:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    display:flex;
+    gap:14px;
+    align-items:center;
+}
+
+.mobile-card img{
+    width:90px;
+    height:90px;
+    object-fit:contain;
+    border-radius:12px;
+    background:#f8fafc;
+}
+
+.mobile-info h4{
+    font-size:18px;
+    margin-bottom:6px;
+}
+
+.mobile-info p{
+    margin:4px 0;
+    color:#334155;
+}
+
+.mobile-price{
+    color:#16a34a !important;
+    font-weight:bold;
+    font-size:18px;
+}
+
+/* BUTTONS */
+.btn-group{
+    margin-top:28px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    padding:12px 18px;
+    background:#2563eb;
+    color:#fff;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:bold;
+    min-width:180px;
+    text-align:center;
+}
+
+.orders-btn{
+    background:#f97316;
+}
+
+.footer{
+    background:#0f172a;
+    color:#cbd5e1;
+    text-align:center;
+    padding:22px 15px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .menu-icon{
+        display:block;
+    }
+
+    .nav-links{
+        display:none;
+        flex-direction:column;
+        position:absolute;
+        top:70px;
+        right:12px;
+        width:220px;
+        background:#0f172a;
+        border-radius:14px;
+        padding:14px;
+    }
+
+    #menu-toggle:checked + .menu-icon + .nav-links{
+        display:flex;
+    }
+
+    .nav-links a{
+        text-align:center;
+    }
+
+    .main-content{
+        padding:20px 10px;
+    }
+
+    .success-container{
+        padding:22px 16px;
+    }
+
+    .heading h2{
+        font-size:24px;
+    }
+
+    .table-box{
+        display:none;
+    }
+
+    .mobile-items{
+        display:block;
+    }
+
+    .btn-group{
+        flex-direction:column;
+    }
+
+    .btn{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <div class="logo-icon">🛒</div>
+        <div>Smart <span>Cart</span></div>
+    </div>
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+
+    <div class="nav-links">
+        <a href="/user-dashboard">🏠 Dashboard</a>
+        <a href="/user/products">🛍️ Products</a>
+        <a href="/user/cart">🛒 Cart</a>
+        <a href="/user/my-orders" class="active-btn">📦 My Orders</a>
+        <a href="/user/profile">👤 Profile</a>
+        <a href="/user-logout">🚪 Logout</a>
+    </div>
+</div>
+
+<div class="main-content">
+
+<div class="success-container">
+
+    <div class="success-icon">✓</div>
+
+    <div class="heading">
+        <h2>🎉 Your Order is Confirmed!</h2>
+        <p>Thank you for shopping with <strong>SmartCart</strong>.</p>
+    </div>
+
+    <div class="order-details">
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
+        <p><strong>Amount Paid:</strong> ₹{{ order.amount }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+
+        {% if order.address %}
+        <p>
+            <strong>Delivery Address:</strong><br>
+            {{ order.full_name }}<br>
+            Phone: {{ order.phone }}<br>
+            {{ order.address }},
+            {{ order.city }},
+            {{ order.state }} -
+            {{ order.pincode }}
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="items-list">
+        <h3>Order Summary</h3>
+
+        <!-- Desktop table -->
+        <div class="table-box">
+            <table>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price ₹</th>
+                </tr>
+
+                {% for it in items %}
+                <tr>
+                    <td class="product-cell">{{ it.product_name }}</td>
+                    <td>{{ it.quantity }}</td>
+                    <td>₹{{ it.price }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Mobile cart style -->
+        <div class="mobile-items">
+            {% for it in items %}
+            <div class="mobile-card">
+
+                {% if it.image %}
+                <img src="{{ url_for('static', filename='uploads/products/' ~ it.image) }}">
+                {% endif %}
+
+                <div class="mobile-info">
+                    <h4>{{ it.product_name }}</h4>
+                    <p>Quantity: {{ it.quantity }}</p>
+                    <p class="mobile-price">₹{{ it.price }}</p>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="btn-group">
+        <a href="/user/products" class="btn">Continue Shopping</a>
+        <a href="/user/my-orders" class="btn orders-btn">View My Orders</a>
+        <a href="/user/download-invoice/{{ order.order_id }}" class="btn">Download Invoice (PDF)</a>
+    </div>
+
+</div>
+</div>
+
+<div class="footer">
+    <p>© 2026 SmartCart. All Rights Reserved.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartCart Dashboard</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#f8fafc;
+    color:#0f172a;
+    min-height:100vh;
+}
+
+/* NAVBAR */
+.navbar{
+    background:#0f172a;
+    color:#fff;
+    padding:14px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:1000;
+    gap:15px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.18);
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:26px;
+    font-weight:bold;
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.logo span{
+    color:#fb923c;
+}
+
+#menu-toggle{
+    display:none;
+}
+
+.menu-icon{
+    display:none;
+    font-size:28px;
+    cursor:pointer;
+    color:#fff;
+}
+
+.nav-links{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:bold;
+    transition:0.3s;
+    font-size:14px;
+    white-space:nowrap;
+}
+
+.nav-links a:hover{
+    background:rgba(255,255,255,0.08);
+}
+
+.profile-link{
+    background:rgba(255,255,255,0.08);
+}
+
+.cart-btn{
+    background:#f97316;
+}
+
+.cart-btn:hover{
+    background:#ea580c;
+}
+
+/* WRAPPER */
+.wrapper{
+    max-width:1200px;
+    margin:30px auto;
+    padding:0 20px;
+}
+
+/* FLASH MESSAGES */
+.flash-container{
+    margin-bottom:20px;
+}
+
+.flash-message{
+    padding:14px 18px;
+    border-radius:12px;
+    margin-bottom:12px;
+    font-weight:bold;
+    transition:0.5s ease;
+}
+
+.flash-message.success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.flash-message.danger{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.flash-message.warning{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+/* WELCOME */
+.welcome{
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    color:#fff;
+    padding:40px;
+    border-radius:22px;
+    margin-bottom:26px;
+}
+
+.welcome h1{
+    font-size:42px;
+    margin-bottom:12px;
+}
+
+.welcome p{
+    font-size:17px;
+    color:#e0e7ff;
+    line-height:1.6;
+    max-width:720px;
+}
+
+.welcome-actions{
+    margin-top:22px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+.welcome-actions a{
+    text-decoration:none;
+    padding:14px 20px;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+.shop-btn{
+    background:#fff;
+    color:#2563eb;
+}
+
+.profile-btn{
+    border:1px solid rgba(255,255,255,0.4);
+    color:#fff;
+}
+
+/* STATS */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.05);
+}
+
+.card h3{
+    font-size:15px;
+    color:#64748b;
+    margin-bottom:10px;
+}
+
+.value{
+    font-size:30px;
+    font-weight:bold;
+}
+
+.orange{
+    border-left:5px solid #f97316;
+}
+
+.green{
+    border-left:5px solid #16a34a;
+}
+
+.purple{
+    border-left:5px solid #7c3aed;
+}
+
+.section-title{
+    font-size:24px;
+    margin-bottom:16px;
+}
+
+/* CATEGORY */
+.categories{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:30px;
+}
+
+.categories a{
+    text-decoration:none;
+    background:#fff;
+    color:#1e293b;
+    padding:14px 22px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.categories a:hover{
+    background:#eff6ff;
+    border-color:#93c5fd;
+}
+
+/* QUICK ACTIONS */
+.actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.action-box{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    text-align:center;
+    box-shadow:0 8px 22px rgba(0,0,0,0.05);
+}
+
+.action-box h4{
+    margin:14px 0 8px;
+    font-size:22px;
+}
+
+.action-box p{
+    font-size:14px;
+    color:#64748b;
+    margin-bottom:14px;
+    line-height:1.5;
+}
+
+.action-box a{
+    text-decoration:none;
+    display:inline-block;
+    padding:10px 16px;
+    border-radius:10px;
+    background:#2563eb;
+    color:#fff;
+    font-weight:bold;
+}
+
+/* FOOTER */
+.footer{
+    background:#0f172a;
+    color:#cbd5e1;
+    text-align:center;
+    padding:24px;
+    margin-top:40px;
+}
+
+/* TABLET */
+@media (max-width:992px){
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .actions{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .welcome h1{
+        font-size:34px;
+    }
+}
+
+/* MOBILE */
+@media (max-width:768px){
+    .navbar{
+        padding:12px 16px;
+    }
+
+    .logo{
+        font-size:22px;
+    }
+
+    .logo-icon{
+        width:38px;
+        height:38px;
+    }
+
+    .menu-icon{
+        display:block;
+    }
+
+    .nav-links{
+        display:none;
+        flex-direction:column;
+        position:fixed;
+        top:66px;
+        right:14px;
+        width:230px;
+        background:#0f172a;
+        padding:14px;
+        border-radius:14px;
+        box-shadow:0 10px 25px rgba(0,0,0,0.25);
+        z-index:9999;
+    }
+
+    .nav-links a{
+        width:100%;
+        text-align:center;
+        padding:12px;
+    }
+
+    #menu-toggle:checked + .menu-icon + .nav-links{
+        display:flex;
+    }
+
+    .wrapper{
+        padding:0 14px;
+        margin:24px auto;
+    }
+
+    .welcome{
+        padding:28px 20px;
+    }
+
+    .welcome h1{
+        font-size:28px;
+    }
+
+    .welcome p{
+        font-size:15px;
+    }
+
+    .welcome-actions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .welcome-actions a{
+        width:100%;
+        text-align:center;
+        padding:12px;
+        font-size:14px;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .card{
+        padding:16px;
+    }
+
+    .value{
+        font-size:22px;
+    }
+
+    .categories{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .categories a{
+        text-align:center;
+        padding:12px 10px;
+        font-size:14px;
+    }
+
+    .actions{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .action-box{
+        padding:16px;
+    }
+
+    .action-box h4{
+        font-size:18px;
+    }
+
+    .action-box p{
+        font-size:12px;
+    }
+
+    .action-box a{
+        width:100%;
+        padding:8px;
+        font-size:13px;
+    }
+}
+
+/* SMALL MOBILE */
+@media (max-width:480px){
+    .navbar{
+        padding:10px 12px;
+    }
+
+    .logo{
+        font-size:20px;
+    }
+
+    .logo-icon{
+        width:35px;
+        height:35px;
+    }
+
+    .nav-links{
+        top:58px;
+        right:10px;
+        width:calc(100% - 20px);
+    }
+
+    .wrapper{
+        padding:0 12px;
+    }
+
+    .welcome{
+        padding:24px 16px;
+        border-radius:18px;
+    }
+
+    .welcome h1{
+        font-size:24px;
+    }
+
+    .welcome p{
+        font-size:14px;
+    }
+
+    .welcome-actions{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .actions{
+        grid-template-columns:1fr;
+    }
+
+    .categories{
+        grid-template-columns:1fr;
+    }
+
+    .section-title{
+        font-size:21px;
+    }
+
+    .footer{
+        font-size:13px;
+        padding:20px 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+    <div class="logo">
+        <div class="logo-icon">🛒</div>
+        <div>Smart <span>Cart</span></div>
+    </div>
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+
+    <div class="nav-links">
+        <a href="/user-dashboard">📊 Dashboard</a>
+        <a href="/user/products">🛍️ Shop</a>
+        <a href="/user/profile" class="profile-link">👤 Profile</a>
+        <a href="/user/cart" class="cart-btn">🛒 Cart</a>
+        <a href="/user-logout">🚪 Logout</a>
+    </div>
+</div>
+
+<div class="wrapper">
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- WELCOME -->
+    <div class="welcome">
+        <h1>Welcome, {{ user_name }} 👋</h1>
+        <p>
+            Your SmartCart dashboard is ready. Browse products, manage your cart,
+            update profile and enjoy easy shopping.
+        </p>
+
+        <div class="welcome-actions">
+            <a href="/user/products" class="shop-btn">🛍️ Start Shopping</a>
+            <a href="/user/profile" class="profile-btn">👤 My Profile</a>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+
+        <div class="card orange">
+            <h3>Cart Items</h3>
+            <div class="value">{{ cart_count }}</div>
+        </div>
+
+        <div class="card green">
+            <h3>Saved Amount</h3>
+            <div class="value">₹{{ saved_amount }}</div>
+        </div>
+
+        <div class="card purple">
+            <h3>Member Since</h3>
+            <div class="value">{{ member_since }}</div>
+        </div>
+
+    </div>
+
+    <!-- CATEGORIES -->
+    <h2 class="section-title">🏷️ Browse by Category</h2>
+
+    <div class="categories">
+        <a href="/user/products">All Products</a>
+
+        {% for cat in categories %}
+            <a href="/user/products?category={{ cat.category }}">
+                {{ cat.category }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <h2 class="section-title">Quick Actions</h2>
+
+    <div class="actions">
+
+        <div class="action-box">
+            <div style="font-size:42px;">🛍️</div>
+            <h4>Browse Products</h4>
+            <p>Check latest products and offers.</p>
+            <a href="/user/products">Open</a>
+        </div>
+
+        <div class="action-box">
+            <div style="font-size:42px;">🛒</div>
+            <h4>My Cart</h4>
+            <p>Review items added to your cart.</p>
+            <a href="/user/cart">Open</a>
+        </div>
+
+        <div class="action-box">
+            <div style="font-size:42px;">👤</div>
+            <h4>My Profile</h4>
+            <p>Update name, password and image.</p>
+            <a href="/user/profile">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <p>© 2026 SmartCart. All Rights Reserved.</p>
+    <p>Designed uniquely for your project ❤️</p>
+</div>
+
+<script>
+setTimeout(function(){
+    let flashMessages = document.querySelectorAll(".flash-message");
+
+    flashMessages.forEach(function(msg){
+        msg.style.opacity = "0";
+
+        setTimeout(function(){
+            msg.remove();
+        }, 500);
+    });
+}, 3000);
+</script>
+
+</body>
+</html>

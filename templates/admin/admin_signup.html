@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Signup</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box {
+            background: white;
+            width: 380px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            margin-top: 10px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 5px rgba(79,172,254,0.4);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px;
+            background: #4facfe;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00c6ff;
+        }
+
+        .msg {
+            font-size: 13px;
+            color: red;
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="box">
+
+    <h2>Admin Registration</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <p class="msg">{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="/admin-signup">
+
+        <label>Name:</label>
+        <input type="text" name="name" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <button type="submit">Send OTP</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

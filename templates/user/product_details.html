@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Details</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f1f5f9;
+    color:#0f172a;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.navbar{
+    width:100%;
+    background:#0f172a;
+    padding:14px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo span{color:#fb923c;}
+
+#menu-toggle{display:none;}
+
+.menu-icon{
+    display:none;
+    font-size:28px;
+    color:#fff;
+    cursor:pointer;
+}
+
+.nav-links{
+    display:flex;
+    gap:10px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.shop-link{background:rgba(255,255,255,0.08);}
+.cart-btn{background:#f97316;}
+
+.main-content{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    padding:28px 16px;
+}
+
+.product-box{
+    width:100%;
+    max-width:420px;
+    background:#fff;
+    padding:24px;
+    border-radius:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+
+.flash-msg{
+    background:#dcfce7;
+    color:#166534;
+    padding:12px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:15px;
+    animation:fadeOut 3s forwards;
+}
+
+@keyframes fadeOut{
+    0%{opacity:1;}
+    80%{opacity:1;}
+    100%{opacity:0;visibility:hidden;}
+}
+
+.product-box h2{
+    text-align:center;
+    font-size:28px;
+    margin-bottom:20px;
+}
+
+.image-box{
+    width:100%;
+    height:230px;
+    background:#f8fafc;
+    border-radius:16px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.image-box img{
+    max-width:180px;
+    height:190px;
+    object-fit:contain;
+}
+
+.info p{
+    margin-bottom:10px;
+    font-size:16px;
+}
+
+.price-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+.price{
+    font-size:24px;
+    font-weight:bold;
+    color:#16a34a;
+}
+
+.old-price{
+    color:#94a3b8;
+    text-decoration:line-through;
+}
+
+.discount{
+    color:#059669;
+    font-weight:bold;
+}
+
+.save{
+    color:#2563eb;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.btns{
+    margin-top:24px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
+    color:#fff;
+    font-weight:bold;
+    text-align:center;
+}
+
+.back-btn{background:#3b82f6;}
+.cart-add-btn{background:#10b981;}
+
+.footer{
+    background:#0f172a;
+    color:#cbd5e1;
+    text-align:center;
+    padding:22px 15px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+.menu-icon{display:block;}
+
+.nav-links{
+    display:none;
+    flex-direction:column;
+    position:fixed;
+    top:66px;
+    right:14px;
+    width:220px;
+    background:#0f172a;
+    padding:14px;
+    border-radius:14px;
+}
+
+.nav-links a{
+    width:100%;
+    text-align:center;
+}
+
+#menu-toggle:checked + .menu-icon + .nav-links{
+    display:flex;
+}
+
+.product-box{
+    max-width:360px;
+    padding:18px;
+}
+
+.btns{
+    flex-direction:column;
+}
+
+.btn{
+    width:100%;
+}
+
+.image-box{
+    height:210px;
+}
+
+.image-box img{
+    max-width:150px;
+    height:160px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <div class="logo-icon">🛒</div>
+        <div>Smart <span>Cart</span></div>
+    </div>
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+
+    <div class="nav-links">
+        <a href="/user-dashboard">📊 Dashboard</a>
+        <a href="/user/products" class="shop-link">🛍️ Shop</a>
+        <a href="/user/profile">👤 Profile</a>
+        <a href="/user/cart" class="cart-btn">🛒 Cart</a>
+        <a href="/user-logout">🚪 Logout</a>
+    </div>
+</div>
+
+<div class="main-content">
+<div class="product-box">
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="flash-msg">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<h2>{{ product.name }}</h2>
+
+<div class="image-box">
+    <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}">
+</div>
+
+<div class="info">
+    <p><b>Description:</b> {{ product.description }}</p>
+    <p><b>Category:</b> {{ product.category }}</p>
+
+    {% if product.original_price and product.original_price > product.price %}
+        <div class="price-row">
+            <span class="price">₹{{ product.price }}</span>
+            <span class="old-price">₹{{ product.original_price }}</span>
+            <span class="discount">{{ product.discount_percent }}% OFF</span>
+        </div>
+        <div class="save">You Save ₹{{ product.original_price - product.price }}</div>
+    {% else %}
+        <p class="price">₹{{ product.price }}</p>
+    {% endif %}
+</div>
+
+<div class="btns">
+    <a href="/user/products" class="btn back-btn">Back to Products</a>
+    <a href="/user/add-to-cart/{{ product.product_id }}" class="btn cart-add-btn">Add To Cart</a>
+</div>
+
+</div>
+</div>
+
+<div class="footer">
+<p>© 2026 SmartCart. All Rights Reserved.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>SmartCart Invoice</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    color:#1f2937;
+    padding:25px;
+}
+
+.invoice-box{
+    width:85%;
+    margin:auto;
+    border:1px solid #e5e7eb;
+    padding:25px;
+    border-radius:10px;
+}
+
+.header{
+    background:#2563eb;
+    color:white;
+    text-align:center;
+    padding:18px;
+    border-radius:8px;
+}
+
+.header h2{
+    margin:0;
+    font-size:30px;
+}
+
+.info-box{
+    margin-top:20px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    padding:15px;
+    border-radius:8px;
+}
+
+.section-title{
+    color:#2563eb;
+    font-size:18px;
+    border-bottom:2px solid #2563eb;
+    padding-bottom:6px;
+    margin-top:22px;
+}
+
+p{
+    font-size:15px;
+    line-height:1.6;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+th{
+    background:#1d4ed8;
+    color:white;
+    padding:10px;
+    text-align:left;
+}
+
+td{
+    padding:10px;
+    border:1px solid #e5e7eb;
+}
+
+.total{
+    margin-top:25px;
+    text-align:right;
+    font-size:22px;
+    font-weight:bold;
+    color:#16a34a;
+}
+
+.footer{
+    margin-top:35px;
+    text-align:center;
+    color:#6b7280;
+    border-top:1px solid #e5e7eb;
+    padding-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="invoice-box">
+
+    <div class="header">
+        <h2>SmartCart Invoice</h2>
+    </div>
+
+    <div class="info-box">
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
+        <p><strong>Order Date:</strong> {{ order.created_at }}</p>
+    </div>
+
+    <h3 class="section-title">Customer Details</h3>
+
+    <div class="info-box">
+        <p><strong>Name:</strong> {{ order.full_name }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+        <p>
+            <strong>Delivery Address:</strong><br>
+            {{ order.address }},
+            {{ order.city }},
+            {{ order.state }} -
+            {{ order.pincode }}
+        </p>
+    </div>
+
+    <h3 class="section-title">Order Items</h3>
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price ₹</th>
+        </tr>
+
+        {% for it in items %}
+        <tr>
+            <td>{{ it.product_name }}</td>
+            <td>{{ it.quantity }}</td>
+            <td>₹{{ it.price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="total">
+        Grand Total: ₹{{ order.amount }}
+    </div>
+
+    <div class="footer">
+        Thank you for shopping with SmartCart
+    </div>
+
+</div>
+
+</body>
+</html>

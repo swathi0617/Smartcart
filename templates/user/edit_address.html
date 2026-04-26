@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Edit Address</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    min-height: 100vh;
+}
+
+.navbar {
+    background: #2874f0;
+    color: white;
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h2 {
+    font-size: 24px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+.container {
+    max-width: 500px;
+    margin: 35px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.12);
+}
+
+.card h3 {
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 13px;
+    margin-bottom: 14px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    font-size: 15px;
+}
+
+textarea {
+    height: 90px;
+    resize: none;
+}
+
+.btn {
+    display: inline-block;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 9px;
+    background: #2874f0;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.btn:hover {
+    background: #0b5ed7;
+}
+
+.back {
+    background: #6c757d;
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        padding: 14px 18px;
+    }
+
+    .navbar h2 {
+        font-size: 20px;
+    }
+
+    .card {
+        padding: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2>Edit Address</h2>
+    <a href="/add-address">Back</a>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h3>Update Delivery Address</h3>
+
+        <form method="POST">
+            <input type="text" name="full_name" value="{{ address.full_name }}" required>
+
+            <input type="text" name="phone" value="{{ address.phone }}" required>
+
+            <textarea name="address" required>{{ address.address }}</textarea>
+
+            <input type="text" name="city" value="{{ address.city }}" required>
+
+            <input type="text" name="state" value="{{ address.state }}" required>
+
+            <input type="text" name="pincode" value="{{ address.pincode }}" required>
+
+            <button type="submit" class="btn">Update Address</button>
+            <a href="/add-address" class="btn back">Cancel</a>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

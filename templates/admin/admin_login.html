@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .login-box {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            float: left;
+            font-size: 14px;
+            margin-top: 10px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 5px rgba(79,172,254,0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background: #4facfe;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #00c6ff;
+        }
+
+        .links {
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        .links a {
+            color: #4facfe;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .msg {
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="login-box">
+
+    <h2>Admin Login</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <p class="msg" style="color:red;">{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="/admin-login">
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+    <div class="links">
+        <a href="/forgot-password">Forgot Password?</a> |
+        <a href="/admin-signup">Register</a>
+    </div>
+
+</div>
+
+</body>
+</html>
