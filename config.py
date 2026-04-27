@@ -20,5 +20,5 @@ MAIL_USE_TLS = True
 MAIL_USERNAME = 'swathisampatam68@gmail.com'
 MAIL_PASSWORD = 'kokm gvqu lbpj tkbv'   # Gmail App Password
 
-RAZORPAY_KEY_ID = "rzp_test_ShE5m1yXJddi8o"
-RAZORPAY_KEY_SECRET = "88Rf7VbQJDl9wyj6puOh1oTl"
+RAZORPAY_KEY_ID = "rzp_test_SiLaHl8V0JbD7X"
+RAZORPAY_KEY_SECRET = "bL4cXIog3Sy1bjRnN1qL8gHB"
