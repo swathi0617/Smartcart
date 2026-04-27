@@ -998,7 +998,8 @@ def add_to_cart(product_id):
     conn.close()
 
     flash("Item added to cart successfully!", "success")
-    return redirect(f'/user/product/{product_id}')
+    return redirect(request.referrer)
+
 # =================================================================
 # VIEW CART PAGE
 # =================================================================
@@ -1465,6 +1466,21 @@ def payment(address_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # address check
+    cursor.execute("""
+        SELECT *
+        FROM addresses
+        WHERE id = ? AND user_id = ?
+    """, (address_id, user_id))
+
+    address = cursor.fetchone()
+
+    if not address:
+        cursor.close()
+        conn.close()
+        flash("Address not found!", "danger")
+        return redirect('/add-address')
+
     placeholders = ",".join(["?"] * len(selected_products))
 
     query = f"""
@@ -1514,7 +1530,8 @@ def payment(address_id):
         grand_total=grand_total,
         key_id=config.RAZORPAY_KEY_ID,
         order_id=razorpay_order['id'],
-        address_id=address_id
+        address_id=address_id,
+        address=address
     )
 # DAY 13: Verify Razorpay Payment & Store Order + Order Items
 
