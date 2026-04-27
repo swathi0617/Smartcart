@@ -119,46 +119,70 @@ body{
     font-size:16px;
 }
 
-.table-box{
+.orders-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+}
+
+.order-card{
     background:#fff;
-    padding:18px;
     border-radius:18px;
+    padding:22px;
     box-shadow:0 8px 22px rgba(0,0,0,0.08);
-    overflow-x:auto;
+    transition:0.3s;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:850px;
+.order-card:hover{
+    transform:translateY(-4px);
 }
 
-th{
-    background:#0f172a;
-    color:#fff;
-    padding:13px;
-    text-align:center;
+.order-id{
+    font-size:22px;
+    font-weight:bold;
+    color:#111827;
+    margin-bottom:14px;
 }
 
-td{
-    padding:13px;
-    border-bottom:1px solid #e5e7eb;
-    text-align:center;
+.info{
+    margin:8px 0;
     color:#334155;
+    font-size:15px;
+    word-break:break-word;
 }
 
-tr:hover{
-    background:#f8fafc;
+.label{
+    font-weight:bold;
+    color:#0f172a;
+}
+
+.status{
+    display:inline-block;
+    margin-top:10px;
+    padding:6px 12px;
+    border-radius:30px;
+    background:#dcfce7;
+    color:#166534;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.btn-group{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
 }
 
 .btn{
+    flex:1;
+    text-align:center;
     text-decoration:none;
-    padding:8px 12px;
-    border-radius:8px;
+    padding:10px 14px;
+    border-radius:10px;
     color:#fff;
-    font-size:13px;
+    font-size:14px;
     font-weight:bold;
-    display:inline-block;
 }
 
 .view-btn{
@@ -242,17 +266,13 @@ tr:hover{
         font-size:28px;
     }
 
-    .table-box{
-        padding:12px;
+    .order-card{
+        padding:18px;
     }
 
-    table{
-        min-width:760px;
-    }
-
-    th,td{
-        padding:10px;
-        font-size:13px;
+    .btn{
+        width:100%;
+        flex:none;
     }
 }
 </style>
@@ -292,32 +312,38 @@ tr:hover{
 
     {% if orders %}
 
-    <div class="table-box">
-        <table>
-            <tr>
-                <th>Order ID</th>
-                <th>Razorpay Order ID</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>View</th>
-                <th>Invoice</th>
-            </tr>
+    <div class="orders-grid">
 
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.order_id }}</td>
-                <td>{{ order.razorpay_order_id }}</td>
-                <td>₹{{ order.amount }}</td>
-                <td>{{ order.created_at }}</td>
-                <td>
-                    <a href="/user/order-success/{{ order.order_id }}" class="btn view-btn">View</a>
-                </td>
-                <td>
-                    <a href="/user/download-invoice/{{ order.order_id }}" class="btn invoice-btn">PDF</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+        {% for order in orders %}
+        <div class="order-card">
+
+            <div class="order-id">📦 Order #{{ order.order_id }}</div>
+
+            <div class="info">
+                <span class="label">Razorpay ID:</span>
+                {{ order.razorpay_order_id }}
+            </div>
+
+            <div class="info">
+                <span class="label">Amount:</span>
+                ₹{{ order.amount }}
+            </div>
+
+            <div class="info">
+                <span class="label">Date:</span>
+                {{ order.created_at }}
+            </div>
+
+            <span class="status">Placed Successfully</span>
+
+            <div class="btn-group">
+                <a href="/user/order-success/{{ order.order_id }}" class="btn view-btn">View</a>
+                <a href="/user/download-invoice/{{ order.order_id }}" class="btn invoice-btn">Invoice</a>
+            </div>
+
+        </div>
+        {% endfor %}
+
     </div>
 
     {% else %}
