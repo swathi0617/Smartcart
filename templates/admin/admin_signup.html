@@ -1,107 +1,299 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Signup</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Signup - SmartCart</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
 
-        .box {
-            background: white;
-            width: 380px;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            text-align: center;
-        }
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    display:flex;
+    flex-direction:column;
+}
 
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+/* NAVBAR */
+.navbar{
+    width:100%;
+    background:linear-gradient(135deg,#ffffff,#eff6ff);
+    padding:15px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.12);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
 
-        label {
-            display: block;
-            text-align: left;
-            font-size: 14px;
-            margin-top: 10px;
-            color: #444;
-        }
+.logo{
+    font-size:28px;
+    font-weight:800;
+    color:#1e3a8a;
+}
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            outline: none;
-        }
+.nav-links{
+    display:flex;
+    gap:18px;
+}
 
-        input:focus {
-            border-color: #4facfe;
-            box-shadow: 0 0 5px rgba(79,172,254,0.4);
-        }
+.nav-links a{
+    text-decoration:none;
+    color:#1e3a8a;
+    font-weight:700;
+    padding:8px 14px;
+    border-radius:8px;
+    transition:0.3s;
+}
 
-        button {
-            width: 100%;
-            margin-top: 20px;
-            padding: 10px;
-            background: #4facfe;
-            border: none;
-            color: white;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.nav-links a:hover{
+    background:#2563eb;
+    color:white;
+}
 
-        button:hover {
-            background: #00c6ff;
-        }
+/* MAIN */
+.main{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+}
 
-        .msg {
-            font-size: 13px;
-            color: red;
-            margin-bottom: 10px;
-        }
+.box{
+    width:100%;
+    max-width:450px;
+    background:white;
+    padding:35px 30px;
+    border-radius:24px;
+    box-shadow:0 18px 45px rgba(0,0,0,0.25);
+}
 
-    </style>
+.box h2{
+    text-align:center;
+    color:#111827;
+    font-size:30px;
+    margin-bottom:10px;
+}
 
+.subtitle{
+    text-align:center;
+    color:#64748b;
+    font-size:14px;
+    margin-bottom:24px;
+    line-height:1.5;
+}
+
+label{
+    display:block;
+    margin-bottom:7px;
+    color:#374151;
+    font-weight:700;
+    font-size:15px;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    font-size:15px;
+    outline:none;
+    margin-bottom:18px;
+}
+
+input:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 4px rgba(37,99,235,0.15);
+}
+
+button{
+    width:100%;
+    padding:14px;
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    color:white;
+    border:none;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:800;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(37,99,235,0.30);
+}
+
+.login-link{
+    text-align:center;
+    margin-top:18px;
+    color:#64748b;
+    font-size:15px;
+}
+
+.login-link a{
+    color:#2563eb;
+    font-weight:800;
+    text-decoration:none;
+}
+
+.login-link a:hover{
+    text-decoration:underline;
+}
+
+/* FLASH */
+.flash{
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:15px;
+    text-align:center;
+    font-weight:700;
+    font-size:14px;
+}
+
+.flash.success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.flash.danger{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.flash.warning{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.flash.info{
+    background:#dbeafe;
+    color:#1e40af;
+}
+
+/* FOOTER */
+.footer{
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:16px 10px;
+    font-size:14px;
+}
+
+/* TABLET */
+@media(max-width:768px){
+    .navbar{
+        padding:14px 5%;
+    }
+
+    .logo{
+        font-size:24px;
+    }
+
+    .nav-links{
+        gap:10px;
+    }
+
+    .nav-links a{
+        font-size:14px;
+        padding:8px 10px;
+    }
+}
+
+/* MOBILE */
+@media(max-width:480px){
+    .navbar{
+        flex-direction:column;
+        gap:12px;
+    }
+
+    .nav-links{
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+    }
+
+    .main{
+        padding:30px 15px;
+        align-items:flex-start;
+    }
+
+    .box{
+        margin-top:20px;
+        padding:28px 22px;
+        border-radius:20px;
+    }
+
+    .box h2{
+        font-size:26px;
+    }
+
+    input,
+    button{
+        font-size:15px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-<div class="box">
+<nav class="navbar">
+    <div class="logo">🛒 SmartCart</div>
 
-    <h2>Admin Registration</h2>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/admin-login">Admin Login</a>
+    </div>
+</nav>
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <p class="msg">{{ message }}</p>
-      {% endfor %}
-    {% endwith %}
+<div class="main">
 
-    <form method="POST" action="/admin-signup">
+    <div class="box">
+        <h2>Admin Registration</h2>
+        <p class="subtitle">Create your SmartCart admin account and verify using OTP.</p>
 
-        <label>Name:</label>
-        <input type="text" name="name" required>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+        <form method="POST" action="/admin-signup">
 
-        <button type="submit">Send OTP</button>
+            <label>Name:</label>
+            <input type="text" name="name" placeholder="Enter admin name" required>
 
-    </form>
+            <label>Email:</label>
+            <input type="email" name="email" placeholder="Enter admin email" required>
+
+            <button type="submit">Send OTP</button>
+
+        </form>
+
+        <div class="login-link">
+            Already have an account?
+            <a href="/admin-login">Login here</a>
+        </div>
+
+    </div>
 
 </div>
+
+<footer class="footer">
+    © 2026 SmartCart. All Rights Reserved.
+</footer>
 
 </body>
 </html>
