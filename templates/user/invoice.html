@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>SmartCart Invoice</title>
 
 <style>
+@page {
+    size: A4;
+    margin: 18mm;
+}
+
 body{
-    font-family:Arial, sans-serif;
+    font-family: Arial, sans-serif;
     color:#1f2937;
-    padding:25px;
+    font-size:14px;
+    margin:0;
+    padding:0;
 }
 
 .invoice-box{
-    width:85%;
-    margin:auto;
-    border:1px solid #e5e7eb;
-    padding:25px;
-    border-radius:10px;
+    width:100%;
+    border:1px solid #d1d5db;
+    padding:20px;
 }
 
 .header{
@@ -24,67 +29,61 @@ body{
     color:white;
     text-align:center;
     padding:18px;
-    border-radius:8px;
 }
 
 .header h2{
     margin:0;
-    font-size:30px;
-}
-
-.info-box{
-    margin-top:20px;
-    background:#f9fafb;
-    border:1px solid #e5e7eb;
-    padding:15px;
-    border-radius:8px;
 }
 
 .section-title{
-    color:#2563eb;
-    font-size:18px;
-    border-bottom:2px solid #2563eb;
-    padding-bottom:6px;
-    margin-top:22px;
+    background:#7c3aed;
+    color:white;
+    padding:8px 10px;
+    margin-top:18px;
+    font-size:16px;
 }
 
-p{
-    font-size:15px;
-    line-height:1.6;
+.info-box{
+    margin-top:10px;
+    padding:10px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+}
+
+.info-box p{
+    margin:6px 0;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    margin-top:15px;
+    margin-top:10px;
 }
 
 th{
     background:#1d4ed8;
     color:white;
-    padding:10px;
-    text-align:left;
+    padding:8px;
+    border:1px solid #d1d5db;
 }
 
 td{
-    padding:10px;
-    border:1px solid #e5e7eb;
+    padding:8px;
+    border:1px solid #d1d5db;
 }
 
 .total{
-    margin-top:25px;
     text-align:right;
-    font-size:22px;
+    margin-top:15px;
+    font-size:18px;
     font-weight:bold;
     color:#16a34a;
 }
 
 .footer{
-    margin-top:35px;
+    margin-top:25px;
     text-align:center;
     color:#6b7280;
-    border-top:1px solid #e5e7eb;
-    padding-top:15px;
 }
 </style>
 </head>
@@ -97,33 +96,31 @@ td{
         <h2>SmartCart Invoice</h2>
     </div>
 
+    <div class="section-title">Invoice Details</div>
     <div class="info-box">
         <p><strong>Order ID:</strong> {{ order.order_id }}</p>
         <p><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
         <p><strong>Order Date:</strong> {{ order.created_at }}</p>
     </div>
 
-    <h3 class="section-title">Customer Details</h3>
-
+    <div class="section-title">Customer Details</div>
     <div class="info-box">
         <p><strong>Name:</strong> {{ order.full_name }}</p>
         <p><strong>Phone:</strong> {{ order.phone }}</p>
-        <p>
-            <strong>Delivery Address:</strong><br>
+        <p><strong>Address:</strong>
             {{ order.address }},
             {{ order.city }},
-            {{ order.state }} -
-            {{ order.pincode }}
+            {{ order.state }} - {{ order.pincode }}
         </p>
     </div>
 
-    <h3 class="section-title">Order Items</h3>
+    <div class="section-title">Order Items</div>
 
     <table>
         <tr>
             <th>Product</th>
             <th>Qty</th>
-            <th>Price ₹</th>
+            <th>Price</th>
         </tr>
 
         {% for it in items %}
