@@ -1,162 +1,329 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Product</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Product - SmartCart</title>
 
-    <style>
-        body{
-            margin:0;
-            font-family:Arial,sans-serif;
-            background:#f4f6f9;
-        }
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
-        .header{
-            background:linear-gradient(90deg,#4facfe,#00c6ff);
-            color:white;
-            padding:15px 20px;
-        }
+body{
+min-height:100vh;
+background:#eef4ff;
+color:#111827;
+display:flex;
+flex-direction:column;
+}
 
-        .header h2{
-            margin:0;
-        }
+/* NAVBAR */
+.navbar{
+width:100%;
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+padding:16px 7%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:sticky;
+top:0;
+z-index:1000;
+box-shadow:0 5px 18px rgba(0,0,0,.18);
+}
 
-        .container{
-            display:flex;
-            justify-content:center;
-            padding:30px;
-        }
+.logo{
+color:white;
+font-size:26px;
+font-weight:800;
+}
 
-        .form-box{
-            background:white;
-            width:460px;
-            padding:25px;
-            border-radius:12px;
-            box-shadow:0 6px 18px rgba(0,0,0,0.1);
-        }
+.menu-toggle{
+display:none;
+font-size:28px;
+color:white;
+cursor:pointer;
+}
 
-        .form-box h2{
-            text-align:center;
-            margin-bottom:20px;
-            color:#333;
-        }
+.nav-links{
+display:flex;
+gap:12px;
+align-items:center;
+}
 
-        label{
-            font-size:14px;
-            color:#444;
-            font-weight:bold;
-        }
+.nav-links a{
+color:white;
+text-decoration:none;
+font-weight:700;
+padding:9px 14px;
+border-radius:9px;
+background:rgba(255,255,255,.13);
+font-size:14px;
+}
 
-        input,textarea{
-            width:100%;
-            padding:10px;
-            margin-top:5px;
-            margin-bottom:15px;
-            border:1px solid #ccc;
-            border-radius:6px;
-            outline:none;
-            box-sizing:border-box;
-        }
+.nav-links a:hover{
+background:white;
+color:#1e3a8a;
+}
 
-        input:focus,textarea:focus{
-            border-color:#4facfe;
-            box-shadow:0 0 5px rgba(79,172,254,0.4);
-        }
+.logout{
+background:#ef4444 !important;
+}
 
-        textarea{
-            resize:none;
-            height:80px;
-        }
+/* MAIN */
+.container{
+flex:1;
+width:100%;
+max-width:950px;
+margin:auto;
+padding:35px 20px;
+}
 
-        .hint{
-            font-size:12px;
-            color:#64748b;
-            margin-top:-10px;
-            margin-bottom:12px;
-        }
+.page-title{
+text-align:center;
+margin-bottom:25px;
+}
 
-        button{
-            width:100%;
-            padding:11px;
-            background:#4facfe;
-            border:none;
-            color:white;
-            font-size:16px;
-            border-radius:6px;
-            cursor:pointer;
-            font-weight:bold;
-        }
+.page-title h1{
+color:#1e3a8a;
+font-size:34px;
+margin-bottom:8px;
+}
 
-        button:hover{
-            background:#00c6ff;
-        }
+.page-title p{
+color:#64748b;
+font-size:15px;
+}
 
-        .msg{
-            text-align:center;
-            color:green;
-            margin-bottom:10px;
-        }
+.form-box{
+background:white;
+width:100%;
+max-width:620px;
+margin:auto;
+padding:32px;
+border-radius:24px;
+box-shadow:0 16px 40px rgba(30,58,138,.18);
+}
 
-        .back{
-            display:block;
-            text-align:center;
-            text-decoration:none;
-            color:#2563eb;
-            font-weight:bold;
-        }
-    </style>
+.form-box h2{
+text-align:center;
+margin-bottom:24px;
+font-size:28px;
+}
+
+label{
+display:block;
+font-size:15px;
+font-weight:700;
+margin-bottom:7px;
+color:#374151;
+}
+
+input,
+textarea{
+width:100%;
+padding:13px 14px;
+margin-bottom:16px;
+border:1px solid #d1d5db;
+border-radius:12px;
+outline:none;
+font-size:15px;
+}
+
+input:focus,
+textarea:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.15);
+}
+
+textarea{
+resize:none;
+min-height:95px;
+}
+
+.hint{
+font-size:12px;
+color:#64748b;
+margin-top:-10px;
+margin-bottom:14px;
+}
+
+button{
+width:100%;
+padding:14px;
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+border:none;
+color:white;
+font-size:17px;
+border-radius:12px;
+cursor:pointer;
+font-weight:800;
+}
+
+.flash{
+padding:12px;
+border-radius:10px;
+margin-bottom:15px;
+text-align:center;
+font-weight:700;
+font-size:14px;
+background:#dcfce7;
+color:#166534;
+}
+
+.back{
+display:block;
+text-align:center;
+text-decoration:none;
+color:#2563eb;
+font-weight:800;
+margin-top:18px;
+}
+
+.footer{
+background:#0f172a;
+color:white;
+text-align:center;
+padding:16px 10px;
+margin-top:35px;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+
+.menu-toggle{
+display:block;
+}
+
+.nav-links{
+display:none;
+position:absolute;
+top:70px;
+right:15px;
+width:220px;
+background:white;
+border-radius:14px;
+padding:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.18);
+flex-direction:column;
+align-items:stretch;
+}
+
+.nav-links.show{
+display:flex;
+}
+
+.nav-links a{
+background:#f1f5f9;
+color:#1e3a8a;
+text-align:center;
+}
+
+.logout{
+background:#fee2e2 !important;
+color:#991b1b !important;
+}
+
+.container{
+padding:25px 14px;
+}
+
+.page-title h1{
+font-size:27px;
+}
+
+.form-box{
+padding:24px 20px;
+border-radius:20px;
+}
+
+.form-box h2{
+font-size:24px;
+}
+}
+</style>
 </head>
+
 <body>
 
-<div class="header">
-    <h2>Add New Product</h2>
+<div class="navbar">
+
+<div class="logo">🛒 SmartCart Admin</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<div class="nav-links" id="navMenu">
+<a href="/admin-dashboard">Dashboard</a>
+<a href="/admin/add-item">Add Product</a>
+<a href="/admin/item-list">View Products</a>
+<a href="/admin/profile">Profile</a>
+<a class="logout" href="/admin-logout">Logout</a>
+</div>
+
 </div>
 
 <div class="container">
+
+<div class="page-title">
+<h1>Add New Product</h1>
+<p>Add product details, discount and image for SmartCart users.</p>
+</div>
 
 <div class="form-box">
 
 <h2>Product Details</h2>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <p class="msg">{{ message }}</p>
-  {% endfor %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash">{{ message }}</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
 
 <form method="POST" action="/admin/add-item" enctype="multipart/form-data">
 
-    <label>Product Name:</label>
-    <input type="text" name="name" required>
+<label>Product Name:</label>
+<input type="text" name="name" placeholder="Enter product name" required>
 
-    <label>Description:</label>
-    <textarea name="description" required></textarea>
+<label>Description:</label>
+<textarea name="description" placeholder="Enter product description" required></textarea>
 
-    <label>Category:</label>
-    <input type="text" name="category" required>
+<label>Category:</label>
+<input type="text" name="category" placeholder="Example: Electronics, Fashion, Grocery" required>
 
-    <label>Original Price:</label>
-    <input type="number" step="0.01" name="original_price" required>
-    <p class="hint">Example: ₹1000</p>
+<label>Original Price:</label>
+<input type="number" step="0.01" name="original_price" placeholder="Example: 1000" required>
+<p class="hint">Enter price before discount.</p>
 
-    <label>Discount Percentage:</label>
-    <input type="number" name="discount_percent" min="0" max="100" value="0" required>
-    <p class="hint">Example: 20 = 20% OFF</p>
+<label>Discount Percentage:</label>
+<input type="number" name="discount_percent" min="0" max="100" value="0" required>
+<p class="hint">Example: 20 means 20% OFF.</p>
 
-    <!-- PRICE AUTO CALCULATE AVTUNDI -->
-    <!-- Coins AUTO CALCULATE AVTAI -->
+<label>Product Image:</label>
+<input type="file" name="image" accept="image/*" required>
 
-    <label>Product Image:</label>
-    <input type="file" name="image" accept="image/*" required>
+<button type="submit">Add Product</button>
 
-    <button type="submit">Add Product</button>
-    <br><br>
-
-    <a class="back" href="/admin-dashboard">← Back To Dashboard</a>
+<a class="back" href="/admin-dashboard">← Back To Dashboard</a>
 
 </form>
 
 </div>
 </div>
+
+<footer class="footer">
+© 2026 SmartCart. All Rights Reserved.
+</footer>
+
+<script>
+function toggleMenu(){
+document.getElementById("navMenu").classList.toggle("show");
+}
+</script>
 
 </body>
 </html>
