@@ -1,28 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Verify OTP</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify OTP - SmartCart</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(135deg,#e0ecff,#f8fbff);
+}
+
+/* Navbar */
+.navbar{
+    width:100%;
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    color:#fff;
+    padding:16px 8%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position:sticky;
+    top:0;
+    z-index:1000;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.nav-links{
+    display:flex;
+    gap:20px;
+}
+
+.nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.nav-links a:hover{
+    color:#dbeafe;
+}
+
+/* Main */
+.main{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 15px;
+}
+
+.card{
+    width:100%;
+    max-width:460px;
+    background:#fff;
+    padding:35px 30px;
+    border-radius:22px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.12);
+}
+
+.card h2{
+    text-align:center;
+    color:#1e3a8a;
+    font-size:30px;
+    margin-bottom:8px;
+}
+
+.sub{
+    text-align:center;
+    color:#64748b;
+    font-size:14px;
+    margin-bottom:22px;
+}
+
+/* Flash messages */
+.flash{
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:16px;
+    font-size:14px;
+    text-align:center;
+    font-weight:600;
+}
+
+.flash.success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.flash.danger,
+.flash.error{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+.flash.warning{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+/* Form */
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#1f2937;
+    font-weight:600;
+}
+
+input{
+    width:100%;
+    padding:13px 14px;
+    border:1px solid #cbd5e1;
+    border-radius:12px;
+    margin-bottom:18px;
+    font-size:15px;
+    outline:none;
+    transition:0.3s;
+}
+
+input:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(37,99,235,0.35);
+}
+
+.extra{
+    text-align:center;
+    margin-top:18px;
+}
+
+.extra a{
+    text-decoration:none;
+    color:#2563eb;
+    font-weight:600;
+}
+
+/* Footer */
+.footer{
+    background:#0f172a;
+    color:#cbd5e1;
+    text-align:center;
+    padding:18px 10px;
+    font-size:14px;
+}
+
+/* Tablet */
+@media(max-width:768px){
+    .navbar{
+        padding:15px 5%;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .nav-links{
+        gap:15px;
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+}
+
+/* Mobile */
+@media(max-width:480px){
+    .logo{
+        font-size:24px;
+    }
+
+    .card{
+        padding:28px 20px;
+        border-radius:18px;
+    }
+
+    .card h2{
+        font-size:26px;
+    }
+
+    .nav-links{
+        width:100%;
+        justify-content:space-between;
+        gap:8px;
+    }
+
+    .nav-links a{
+        font-size:13px;
+    }
+
+    input,button{
+        font-size:14px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-<h2>Verify OTP</h2>
+<nav class="navbar">
+    <div class="logo">🛒 SmartCart</div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <p style="color:red;">{{ message }}</p>
-  {% endfor %}
-{% endwith %}
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/admin-login">Login</a>
+        <a href="/admin-signup">Signup</a>
+    </div>
+</nav>
 
-<form method="POST" action="/verify-otp">
+<div class="main">
+    <div class="card">
+        <h2>Verify OTP</h2>
+        <p class="sub">Enter the OTP sent to your email and create a new password</p>
 
-    <label>Enter OTP:</label><br>
-    <input type="text" name="otp" required><br><br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <label>Create Password:</label><br>
-    <input type="password" name="password" required><br><br>
+        <form method="POST" action="/verify-otp">
 
-    <button type="submit">Verify & Register</button>
-</form>
+            <label>Enter OTP</label>
+            <input type="text" name="otp" placeholder="Enter OTP" required>
+
+            <label>Create Password</label>
+            <input type="password" name="password" placeholder="Create Password" required>
+
+            <button type="submit">Verify & Register</button>
+        </form>
+
+        <div class="extra">
+            <a href="/admin-login">← Back to Login</a>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    © 2026 SmartCart. All Rights Reserved.
+</footer>
 
 </body>
 </html>
