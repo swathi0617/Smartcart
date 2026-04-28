@@ -278,29 +278,28 @@ def admin_login():
 # forgot paaword route
 #==================================================================
 @app.route('/forgot-password', methods=['GET', 'POST'])
-def forgot_password():
-    if request.method == 'POST':
-        email = request.form['email']
+def admin_forgot_password():
 
-        token = serializer.dumps(email, salt='reset-password')
+    if request.method == 'GET':
+        return render_template("admin/forgot_password.html")
 
-        reset_link = url_for('reset_password', token=token, _external=True)
+    email = request.form.get('email', '').strip()
 
-        msg = Message(
-            subject="Reset Password",
-            recipients=[email]
-        )
-        msg.body = f"Click link to reset password:\n{reset_link}"
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-        try:
-            mail.send(msg)
-            flash("Reset link sent to your email!", "success")
-        except Exception as e:
-            flash(str(e), "danger")
+    cursor.execute("SELECT * FROM admin WHERE email = ?", (email,))
+    admin = cursor.fetchone()
 
+    cursor.close()
+    conn.close()
+
+    if not admin:
+        flash("Admin email not found!", "danger")
         return redirect('/forgot-password')
 
-    return render_template('admin/forgot_password.html')
+    flash("Reset link sent to admin email!", "success")
+    return redirect('/forgot-password')
 #=============================================================
 #reset_password
 #===============================================================
@@ -795,37 +794,61 @@ def user_register():
 @app.route('/user-login', methods=['GET', 'POST'])
 def user_login():
 
+    # Open login page
     if request.method == 'GET':
+        session.pop('_flashes', None)
         return render_template("user/user_login.html")
 
-    email = request.form['email']
-    password = request.form['password']
+    # Form values
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '').strip()
+
+    # Empty validation
+    if not email or not password:
+        flash("Please enter email and password!", "danger")
+        return redirect('/user-login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+    cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
     user = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
+    # Email not found
     if not user:
         flash("Email not found! Please register.", "danger")
         return redirect('/user-login')
 
-    # Verify password
+    # Password wrong
     if not check_password(password, user['password']):
         flash("Incorrect password!", "danger")
         return redirect('/user-login')
 
-    # Create user session
+    # Clear old session
+    session.clear()
+
+    # New session
     session['user_id'] = user['user_id']
     session['user_name'] = user['name']
     session['user_email'] = user['email']
 
     flash("Login successful!", "success")
     return redirect('/user-dashboard')
+#============== forgot password==========
+@app.route('/user/forgot-password', methods=['GET', 'POST'])
+def user_forgot_password():
+
+    if request.method == 'GET':
+        return render_template("user/forgot_password.html")
+
+    email = request.form.get('email')
+
+    flash("User reset link sent!", "success")
+    return redirect('/user/forgot-password')
+
 # =================================================================
 # ROUTE: USER DASHBOARD
 # =================================================================
@@ -881,11 +904,15 @@ def user_dashboard():
 @app.route('/user-logout')
 def user_logout():
 
-    session.pop('user_id', None)
-    session.pop('user_name', None)
-    session.pop('user_email', None)
+    # Clear complete session
+    session.clear()
 
+    # Remove any pending old flash messages
+    session.pop('_flashes', None)
+
+    # Show only logout message
     flash("Logged out successfully!", "success")
+
     return redirect('/user-login')
 
 # =================================================================
@@ -1045,7 +1072,7 @@ def user_cart():
         grand_total=grand_total,
         saved_amount=saved_amount
     )
-
+#====================cart increase===================================
 
 @app.route('/user/cart/increase/<int:product_id>')
 def increase_cart(product_id):
@@ -1065,7 +1092,7 @@ def increase_cart(product_id):
     conn.close()
 
     return redirect('/user/cart')
-
+#====================cart decrease===========================
 
 @app.route('/user/cart/decrease/<int:product_id>')
 def decrease_cart(product_id):
@@ -1085,7 +1112,7 @@ def decrease_cart(product_id):
     conn.close()
 
     return redirect('/user/cart')
-
+#========================cart remove=======================
 
 @app.route('/user/cart/remove/<int:product_id>')
 def remove_cart(product_id):
@@ -1735,13 +1762,18 @@ def order_success(order_id):
 #==========================================================
 @app.route('/user/my-orders')
 def User_my_orders():
+
+    # Check login
     if 'user_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/user-login')
 
+    user_id = session['user_id']
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Fetch user orders latest first
     cursor.execute("""
         SELECT 
             order_id,
@@ -1752,14 +1784,17 @@ def User_my_orders():
         FROM orders
         WHERE user_id = ?
         ORDER BY order_id DESC
-    """, (session['user_id'],))
+    """, (user_id,))
 
     orders = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
-    return render_template('user/my_orders.html', orders=orders)
+    return render_template(
+        'user/my_orders.html',
+        orders=orders
+    )
 
 # ----------------------------
 # GENERATE INVOICE PDF
@@ -1799,26 +1834,34 @@ def download_invoice(order_id):
         return redirect('/user/my-orders')
 
     cursor.execute("""
-        SELECT *
+        SELECT 
+            product_name,
+            quantity,
+            price
         FROM order_items
         WHERE order_id = ?
     """, (order_id,))
+
     items = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
-    html = render_template("user/invoice.html", order=order, items=items)
+    html = render_template(
+        "user/invoice.html",
+        order=order,
+        items=items
+    )
 
-    pdf = generate_pdf(html)
+    pdf = generate_pdf(order, items)
 
     if not pdf:
         flash("Error generating PDF", "danger")
         return redirect('/user/my-orders')
 
     response = make_response(pdf.getvalue())
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = f'attachment; filename=invoice_{order_id}.pdf'
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = f"attachment; filename=invoice_{order_id}.pdf"
 
     return response
 
