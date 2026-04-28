@@ -18,12 +18,13 @@ razorpay_client = razorpay.Client(
 )
 app.secret_key = config.SECRET_KEY
 serializer = URLSafeTimedSerializer(app.secret_key)
-app.config['MAIL_SERVER'] = config.MAIL_SERVER
-app.config['MAIL_PORT'] = config.MAIL_PORT
-app.config['MAIL_USE_TLS'] = config.MAIL_USE_TLS
-app.config['MAIL_USERNAME'] = config.MAIL_USERNAME
-app.config['MAIL_PASSWORD'] = config.MAIL_PASSWORD
-app.config['MAIL_DEFAULT_SENDER'] = config.MAIL_USERNAME
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'swathisampatam68@gmail.com'
+app.config['MAIL_PASSWORD'] = 'paig xatr gdlx xihc'
+app.config['MAIL_DEFAULT_SENDER'] = 'swathisampatam2004@gmail.com'
 
 mail = Mail(app)
 
@@ -183,16 +184,16 @@ def admin_signup():
     mail.send(message)
 
     flash("OTP sent to your email!", "success")
-    return redirect('/verify-otp')
+    return redirect('/verify-reset-otp')
 
 
 
 # ---------------------------------------------------------
 # ROUTE 2: DISPLAY OTP PAGE
 # ---------------------------------------------------------
-@app.route('/verify-otp', methods=['GET'])
+@app.route('/verify-reset-otp', methods=['GET'])
 def verify_otp_get():
-    return render_template("admin/verify_otp.html")
+    return render_template("admin/verify_reset_otp.html")
 
 
 
@@ -846,9 +847,100 @@ def user_forgot_password():
 
     email = request.form.get('email')
 
-    flash("User reset link sent!", "success")
-    return redirect('/user/forgot-password')
+    if not email:
+        flash("Please enter your email!", "danger")
+        return redirect('/user/forgot-password')
 
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not user:
+        flash("Email not found! Please register first.", "danger")
+        return redirect('/user/forgot-password')
+
+    try:
+        token = serializer.dumps(email, salt='user-reset-password')
+
+        reset_link = url_for(
+            'user_reset_password_page',
+            token=token,
+            _external=True
+        )
+
+        print("USER RESET LINK:", reset_link)
+
+        msg = Message(
+            subject="SmartCart User Password Reset Link",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+
+        msg.body = f"""
+Hello User,
+
+Click this link to reset your password:
+
+{reset_link}
+
+Thanks,
+SmartCart Team
+"""
+
+        mail.send(msg)
+
+        flash("User reset link sent! Please check your email.", "success")
+        return redirect('/user/forgot-password')
+
+    except Exception as e:
+        print("MAIL ERROR:", e)
+        flash(str(e), "danger")
+        return redirect('/user/forgot-password')
+#============= reset password=======================================
+@app.route('/user/reset-password/<token>', methods=['GET', 'POST'])
+def user_reset_password_page(token):
+
+    try:
+        email = serializer.loads(token, salt='user-reset-password', max_age=300)
+    except Exception as e:
+        print("TOKEN ERROR:", e)
+        flash("Reset link expired or invalid!", "danger")
+        return redirect('/user/forgot-password')
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not password or not confirm_password:
+            flash("Please enter both passwords!", "danger")
+            return redirect(request.url)
+
+        if password != confirm_password:
+            flash("Passwords do not match!", "danger")
+            return redirect(request.url)
+
+        hashed_password = bcrypt.hashpw(
+            password.encode('utf-8'),
+            bcrypt.gensalt()
+        ).decode('utf-8')
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE users SET password=? WHERE email=?",
+            (hashed_password, email)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        flash("Password reset successfully! Please login.", "success")
+        return redirect('/user-login')
+
+    return render_template("user/verify_reset_otp.html")
 # =================================================================
 # ROUTE: USER DASHBOARD
 # =================================================================
