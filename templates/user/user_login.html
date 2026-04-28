@@ -8,339 +8,355 @@
 
 <style>
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
 }
 
 body{
-    min-height:100vh;
-    background:linear-gradient(135deg,#dbeafe,#eff6ff,#f8fafc);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+min-height:100vh;
+background:linear-gradient(135deg,#dbeafe,#eff6ff,#f8fafc);
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
 }
 
 .wrapper{
-    width:100%;
-    max-width:1050px;
-    background:#fff;
-    border-radius:28px;
-    overflow:hidden;
-    box-shadow:0 20px 45px rgba(0,0,0,0.12);
-    display:grid;
-    grid-template-columns:1fr 1fr;
+width:100%;
+max-width:1050px;
+background:#fff;
+border-radius:28px;
+overflow:hidden;
+box-shadow:0 20px 45px rgba(0,0,0,0.12);
+display:grid;
+grid-template-columns:1fr 1fr;
 }
 
 /* Left Panel */
 .brand-panel{
-    background:linear-gradient(135deg,#0f172a,#1d4ed8,#2563eb);
-    color:#fff;
-    padding:50px 40px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+background:linear-gradient(135deg,#0f172a,#1d4ed8,#2563eb);
+color:#fff;
+padding:50px 40px;
+display:flex;
+flex-direction:column;
+justify-content:center;
 }
 
 .brand-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    background:rgba(255,255,255,0.12);
-    padding:12px 18px;
-    border-radius:40px;
-    width:fit-content;
-    margin-bottom:28px;
-    font-weight:bold;
+display:inline-flex;
+align-items:center;
+gap:10px;
+background:rgba(255,255,255,0.12);
+padding:12px 18px;
+border-radius:40px;
+width:fit-content;
+margin-bottom:28px;
+font-weight:bold;
 }
 
 .brand-panel h1{
-    font-size:48px;
-    line-height:1.2;
-    margin-bottom:18px;
+font-size:48px;
+line-height:1.2;
+margin-bottom:18px;
 }
 
 .brand-panel p{
-    font-size:17px;
-    color:#dbeafe;
-    line-height:1.7;
-    max-width:420px;
+font-size:17px;
+color:#dbeafe;
+line-height:1.7;
+max-width:420px;
 }
 
 .feature-list{
-    margin-top:30px;
-    display:grid;
-    gap:14px;
+margin-top:30px;
+display:grid;
+gap:14px;
 }
 
 .feature{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-size:15px;
-    color:#eff6ff;
+display:flex;
+align-items:center;
+gap:12px;
+font-size:15px;
+color:#eff6ff;
 }
 
 .feature i{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(255,255,255,0.14);
+width:34px;
+height:34px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:rgba(255,255,255,0.14);
 }
 
 /* Right Panel */
 .form-panel{
-    padding:45px 36px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+padding:45px 36px;
+display:flex;
+flex-direction:column;
+justify-content:center;
 }
 
 .logo{
-    text-align:center;
-    margin-bottom:20px;
+text-align:center;
+margin-bottom:20px;
 }
 
 .logo h2{
-    font-size:34px;
-    color:#0f172a;
-    margin-bottom:6px;
+font-size:34px;
+color:#0f172a;
+margin-bottom:6px;
 }
 
 .logo h2 i{
-    color:#2563eb;
-    margin-right:8px;
+color:#2563eb;
+margin-right:8px;
 }
 
 .logo h2 span{
-    color:#f97316;
+color:#f97316;
 }
 
 .logo p{
-    color:#64748b;
-    font-size:15px;
+color:#64748b;
+font-size:15px;
 }
 
 .heading{
-    text-align:center;
-    margin-bottom:24px;
+text-align:center;
+margin-bottom:24px;
 }
 
 .heading h3{
-    font-size:30px;
-    color:#111827;
-    margin-bottom:8px;
+font-size:30px;
+color:#111827;
+margin-bottom:8px;
 }
 
 .heading p{
-    color:#6b7280;
-    font-size:16px;
+color:#6b7280;
+font-size:16px;
 }
 
-/* Flash */
-.flash-msg p{
-    background:#dcfce7;
-    color:#166534;
-    padding:12px;
-    border-radius:10px;
-    margin-bottom:16px;
-    font-size:14px;
-    text-align:center;
+/* FLASH */
+.flash-msg{
+margin-bottom:16px;
+}
+
+.flash{
+padding:12px;
+border-radius:10px;
+font-size:14px;
+text-align:center;
+font-weight:bold;
+margin-bottom:10px;
+animation:fadeIn .4s ease;
+}
+
+.flash.success{
+background:#dcfce7;
+color:#166534;
+}
+
+.flash.danger{
+background:#fee2e2;
+color:#991b1b;
+}
+
+.flash.warning{
+background:#fef3c7;
+color:#92400e;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(-5px);}
+to{opacity:1;transform:translateY(0);}
 }
 
 /* Form */
 .form-group{
-    margin-bottom:18px;
+margin-bottom:18px;
 }
 
 label{
-    display:block;
-    font-size:14px;
-    font-weight:bold;
-    color:#334155;
-    margin-bottom:8px;
+display:block;
+font-size:14px;
+font-weight:bold;
+color:#334155;
+margin-bottom:8px;
 }
 
 .required{
-    color:red;
+color:red;
 }
 
 .input-box{
-    position:relative;
+position:relative;
 }
 
 .input-box i{
-    position:absolute;
-    top:50%;
-    left:14px;
-    transform:translateY(-50%);
-    color:#94a3b8;
-    font-size:15px;
+position:absolute;
+top:50%;
+left:14px;
+transform:translateY(-50%);
+color:#94a3b8;
+font-size:15px;
 }
 
 input{
-    width:100%;
-    padding:14px 14px 14px 42px;
-    border:1px solid #cbd5e1;
-    border-radius:12px;
-    outline:none;
-    font-size:15px;
-    transition:0.3s;
-    background:#fff;
+width:100%;
+padding:14px 14px 14px 42px;
+border:1px solid #cbd5e1;
+border-radius:12px;
+outline:none;
+font-size:15px;
+transition:0.3s;
+background:#fff;
 }
 
 input:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,0.12);
 }
 
 .forgot{
-    text-align:right;
-    margin-top:-4px;
-    margin-bottom:18px;
+text-align:right;
+margin-top:-4px;
+margin-bottom:18px;
 }
 
 .forgot a{
-    color:#2563eb;
-    text-decoration:none;
-    font-size:14px;
-    font-weight:bold;
-}
-
-.forgot a:hover{
-    text-decoration:underline;
+color:#2563eb;
+text-decoration:none;
+font-size:14px;
+font-weight:bold;
 }
 
 button{
-    width:100%;
-    border:none;
-    padding:15px;
-    border-radius:12px;
-    background:linear-gradient(135deg,#2563eb,#1d4ed8);
-    color:#fff;
-    font-size:17px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
-    margin-top:4px;
+width:100%;
+border:none;
+padding:15px;
+border-radius:12px;
+background:linear-gradient(135deg,#2563eb,#1d4ed8);
+color:#fff;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+margin-top:4px;
 }
 
 button:hover{
-    transform:translateY(-1px);
-    box-shadow:0 10px 18px rgba(37,99,235,0.18);
+transform:translateY(-1px);
+box-shadow:0 10px 18px rgba(37,99,235,0.18);
 }
 
 .divider{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:22px 0;
-    color:#94a3b8;
-    font-size:14px;
+display:flex;
+align-items:center;
+gap:10px;
+margin:22px 0;
+color:#94a3b8;
+font-size:14px;
 }
 
 .divider hr{
-    flex:1;
-    border:none;
-    border-top:1px solid #e2e8f0;
+flex:1;
+border:none;
+border-top:1px solid #e2e8f0;
 }
 
 .signup-link{
-    text-align:center;
-    color:#6b7280;
-    font-size:15px;
+text-align:center;
+color:#6b7280;
+font-size:15px;
 }
 
 .signup-link a{
-    color:#2563eb;
-    text-decoration:none;
-    font-weight:bold;
-}
-
-.signup-link a:hover{
-    text-decoration:underline;
+color:#2563eb;
+text-decoration:none;
+font-weight:bold;
 }
 
 /* Tablet */
 @media (max-width:900px){
-    .wrapper{
-        grid-template-columns:1fr;
-    }
+.wrapper{
+grid-template-columns:1fr;
+}
 
-    .brand-panel{
-        padding:35px 28px;
-    }
+.brand-panel{
+padding:35px 28px;
+}
 
-    .brand-panel h1{
-        font-size:38px;
-    }
+.brand-panel h1{
+font-size:38px;
+}
 
-    .form-panel{
-        padding:35px 28px;
-    }
+.form-panel{
+padding:35px 28px;
+}
 }
 
 /* Mobile */
 @media (max-width:480px){
-    body{
-        padding:12px;
-    }
+body{
+padding:12px;
+}
 
-    .wrapper{
-        border-radius:20px;
-    }
+.wrapper{
+border-radius:20px;
+}
 
-    .brand-panel{
-        padding:26px 18px;
-    }
+.brand-panel{
+padding:26px 18px;
+}
 
-    .brand-panel h1{
-        font-size:30px;
-    }
+.brand-panel h1{
+font-size:30px;
+}
 
-    .brand-panel p{
-        font-size:15px;
-    }
+.brand-panel p{
+font-size:15px;
+}
 
-    .feature{
-        font-size:14px;
-    }
+.feature{
+font-size:14px;
+}
 
-    .form-panel{
-        padding:24px 18px;
-    }
+.form-panel{
+padding:24px 18px;
+}
 
-    .logo h2{
-        font-size:28px;
-    }
+.logo h2{
+font-size:28px;
+}
 
-    .heading h3{
-        font-size:24px;
-    }
+.heading h3{
+font-size:24px;
+}
 
-    .heading p{
-        font-size:14px;
-    }
+.heading p{
+font-size:14px;
+}
 
-    input{
-        font-size:14px;
-        padding:13px 12px 13px 40px;
-    }
+input{
+font-size:14px;
+padding:13px 12px 13px 40px;
+}
 
-    button{
-        font-size:15px;
-        padding:13px;
-    }
+button{
+font-size:15px;
+padding:13px;
+}
 
-    .forgot a,
-    .signup-link{
-        font-size:14px;
-    }
+.forgot a,
+.signup-link{
+font-size:14px;
+}
 }
 </style>
 </head>
@@ -348,94 +364,105 @@ button:hover{
 
 <div class="wrapper">
 
-    <!-- Left Brand Section -->
-    <div class="brand-panel">
-        <div class="brand-badge">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span>SmartCart</span>
-        </div>
+<div class="brand-panel">
+<div class="brand-badge">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>SmartCart</span>
+</div>
 
-        <h1>Welcome back to your shopping space</h1>
-        <p>
-            Login to your SmartCart account and continue exploring products,
-            offers, and hassle-free shopping anytime.
-        </p>
+<h1>Welcome back to your shopping space</h1>
 
-        <div class="feature-list">
-            <div class="feature">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span>Access your cart and saved items</span>
-            </div>
-            <div class="feature">
-                <i class="fa-solid fa-tags"></i>
-                <span>Check the latest deals and offers</span>
-            </div>
-            <div class="feature">
-                <i class="fa-solid fa-user-check"></i>
-                <span>Manage your profile easily</span>
-            </div>
-        </div>
-    </div>
+<p>
+Login to your SmartCart account and continue exploring products,
+offers, and hassle-free shopping anytime.
+</p>
 
-    <!-- Right Form Section -->
-    <div class="form-panel">
+<div class="feature-list">
+<div class="feature">
+<i class="fa-solid fa-bag-shopping"></i>
+<span>Access your cart and saved items</span>
+</div>
 
-        <div class="logo">
-            <h2><i class="fa-solid fa-cart-shopping"></i>Smart<span>Cart</span></h2>
-            <p>Your shopping journey continues here</p>
-        </div>
+<div class="feature">
+<i class="fa-solid fa-tags"></i>
+<span>Check the latest deals and offers</span>
+</div>
 
-        <div class="heading">
-            <h3>Welcome Back</h3>
-            <p>Sign in to continue your SmartCart experience</p>
-        </div>
+<div class="feature">
+<i class="fa-solid fa-user-check"></i>
+<span>Manage your profile easily</span>
+</div>
+</div>
+</div>
 
-        <div class="flash-msg">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <p>{{ message }}</p>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-        </div>
+<div class="form-panel">
 
-        <form method="POST" action="/user-login">
+<div class="logo">
+<h2><i class="fa-solid fa-cart-shopping"></i>Smart<span>Cart</span></h2>
+<p>Your shopping journey continues here</p>
+</div>
 
-            <div class="form-group">
-                <label>Email Address <span class="required">*</span></label>
-                <div class="input-box">
-                    <i class="fa-solid fa-envelope"></i>
-                    <input type="email" name="email" placeholder="Enter your email" required>
-                </div>
-            </div>
+<div class="heading">
+<h3>Welcome Back</h3>
+<p>Sign in to continue your SmartCart experience</p>
+</div>
 
-            <div class="form-group">
-                <label>Password <span class="required">*</span></label>
-                <div class="input-box">
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" name="password" placeholder="Enter your password" required>
-                </div>
-            </div>
+<div class="flash-msg">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+</div>
 
-            <div class="forgot">
-                <a href="/forgot-password">Forgot Password?</a>
-            </div>
+<form method="POST" action="/user-login">
 
-            <button type="submit">Login to SmartCart</button>
-        </form>
+<div class="form-group">
+<label>Email Address <span class="required">*</span></label>
+<div class="input-box">
+<i class="fa-solid fa-envelope"></i>
+<input type="email" name="email" placeholder="Enter your email" required>
+</div>
+</div>
 
-        <div class="divider">
-            <hr> or <hr>
-        </div>
+<div class="form-group">
+<label>Password <span class="required">*</span></label>
+<div class="input-box">
+<i class="fa-solid fa-lock"></i>
+<input type="password" name="password" placeholder="Enter your password" required>
+</div>
+</div>
 
-        <div class="signup-link">
-            New to SmartCart? <a href="/user-register">Create Account</a>
-        </div>
+<div class="forgot">
+<a href="/user/forgot-password">Forgot Password?</a>
+</div>
 
-    </div>
+<button type="submit">Login to SmartCart</button>
+
+</form>
+
+<div class="divider">
+<hr> or <hr>
+</div>
+
+<div class="signup-link">
+New to SmartCart?
+<a href="/user-register">Create Account</a>
+</div>
 
 </div>
+</div>
+
+<script>
+setTimeout(function(){
+let flash=document.querySelectorAll('.flash');
+flash.forEach(function(msg){
+msg.style.display='none';
+});
+},3000);
+</script>
 
 </body>
 </html>
