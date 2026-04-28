@@ -1,232 +1,451 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Products List</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products List - SmartCart</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-        }
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
-        /* Header */
-        .header {
-            background: linear-gradient(90deg, #4facfe, #00c6ff);
-            color: white;
-            padding: 15px 20px;
-        }
+body{
+min-height:100vh;
+background:#eef4ff;
+color:#111827;
+display:flex;
+flex-direction:column;
+}
 
-        .header h2 {
-            margin: 0;
-        }
+/* NAVBAR */
+.navbar{
+width:100%;
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+padding:16px 7%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:sticky;
+top:0;
+z-index:1000;
+box-shadow:0 5px 18px rgba(0,0,0,.18);
+}
 
-        .container {
-            padding: 25px;
-        }
+.logo{
+color:white;
+font-size:26px;
+font-weight:800;
+}
 
-        /* Flash message */
-        .msg {
-            color: green;
-            margin-bottom: 10px;
-        }
+.menu-toggle{
+display:none;
+font-size:28px;
+color:white;
+cursor:pointer;
+}
 
-        /* Search Box */
-        .search-box {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+.nav-links{
+display:flex;
+gap:14px;
+align-items:center;
+}
 
-        input, select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            outline: none;
-        }
+.nav-links a{
+color:white;
+text-decoration:none;
+font-weight:700;
+padding:9px 14px;
+border-radius:9px;
+background:rgba(255,255,255,.13);
+transition:.3s;
+font-size:14px;
+}
 
-        input:focus, select:focus {
-            border-color: #4facfe;
-        }
+.nav-links a:hover{
+background:white;
+color:#1e3a8a;
+}
 
-        button {
-            padding: 10px 15px;
-            background: #4facfe;
-            border: none;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+.logout{
+background:#ef4444 !important;
+}
 
-        button:hover {
-            background: #00c6ff;
-        }
+/* MAIN */
+.container{
+flex:1;
+width:100%;
+max-width:1180px;
+margin:auto;
+padding:35px 20px;
+}
 
-        .add-btn {
-            display: inline-block;
-            margin: 15px 0;
-            padding: 10px 15px;
-            background: green;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        }
+.page-title{
+text-align:center;
+margin-bottom:25px;
+}
 
-        .add-btn:hover {
-            background: darkgreen;
-        }
+.page-title h1{
+color:#1e3a8a;
+font-size:34px;
+margin-bottom:8px;
+}
 
-        /* Table */
-        table {
-            width: 100%;
-            margin-top: 15px;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
+.page-title p{
+color:#64748b;
+font-size:15px;
+}
 
-        th {
-            background: #4facfe;
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
+/* FLASH */
+.flash{
+padding:12px;
+border-radius:10px;
+margin-bottom:15px;
+text-align:center;
+font-weight:700;
+font-size:14px;
+}
 
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
+.flash.success{
+background:#dcfce7;
+color:#166534;
+}
 
-        tr:hover {
-            background: #f1f9ff;
-        }
+.flash.danger{
+background:#fee2e2;
+color:#991b1b;
+}
 
-        img {
-            border-radius: 6px;
-        }
+.flash.warning{
+background:#fef3c7;
+color:#92400e;
+}
 
-        /* Action buttons */
-        .view {
-            color: blue;
-            text-decoration: none;
-        }
+/* SEARCH */
+.search-box{
+background:white;
+padding:18px;
+border-radius:18px;
+box-shadow:0 12px 30px rgba(30,58,138,.14);
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+align-items:center;
+margin-bottom:20px;
+}
 
-        .update {
-            color: orange;
-            text-decoration: none;
-        }
+.search-box input,
+.search-box select{
+flex:1;
+min-width:200px;
+padding:12px 14px;
+border:1px solid #d1d5db;
+border-radius:12px;
+outline:none;
+font-size:14px;
+}
 
-        .delete {
-            color: red;
-            text-decoration: none;
-        }
+.search-box input:focus,
+.search-box select:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.15);
+}
 
-        .delete:hover {
-            font-weight: bold;
-        }
+.search-box button{
+padding:12px 18px;
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+border:none;
+color:white;
+border-radius:12px;
+cursor:pointer;
+font-weight:800;
+}
 
-        .back {
-            display: inline-block;
-            margin-top: 15px;
-            color: #4facfe;
-            text-decoration: none;
-        }
+.add-btn{
+display:inline-block;
+margin:5px 0 20px;
+padding:12px 16px;
+background:#16a34a;
+color:white;
+text-decoration:none;
+border-radius:12px;
+font-weight:800;
+}
 
-    </style>
+.table-box{
+width:100%;
+overflow-x:auto;
+background:white;
+border-radius:18px;
+box-shadow:0 14px 35px rgba(30,58,138,.15);
+}
 
+table{
+width:100%;
+border-collapse:collapse;
+min-width:850px;
+}
+
+th{
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+color:white;
+padding:14px;
+text-align:left;
+font-size:14px;
+}
+
+td{
+padding:14px;
+border-bottom:1px solid #e5e7eb;
+font-size:14px;
+vertical-align:middle;
+}
+
+tr:hover{
+background:#f8fbff;
+}
+
+.product-img{
+width:62px;
+height:62px;
+object-fit:cover;
+border-radius:12px;
+border:1px solid #e5e7eb;
+}
+
+.action-links{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+}
+
+.action-links a{
+text-decoration:none;
+width:42px;
+height:42px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+font-size:20px;
+font-weight:bold;
+}
+
+.view{
+background:#dbeafe;
+color:#1e40af;
+}
+
+.update{
+background:#fef3c7;
+color:#92400e;
+}
+
+.delete{
+background:#fee2e2;
+color:#991b1b;
+}
+
+.back{
+display:inline-block;
+margin-top:20px;
+color:#2563eb;
+text-decoration:none;
+font-weight:800;
+}
+
+.footer{
+background:#0f172a;
+color:white;
+text-align:center;
+padding:16px 10px;
+margin-top:35px;
+}
+
+/* TABLET */
+@media(max-width:900px){
+.logo{
+font-size:23px;
+}
+}
+
+/* MOBILE */
+@media(max-width:600px){
+
+.menu-toggle{
+display:block;
+}
+
+.nav-links{
+display:none;
+position:absolute;
+top:70px;
+right:15px;
+width:220px;
+background:white;
+border-radius:14px;
+padding:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.18);
+flex-direction:column;
+align-items:stretch;
+z-index:2000;
+}
+
+.nav-links.show{
+display:flex;
+}
+
+.nav-links a{
+background:#f1f5f9;
+color:#1e3a8a;
+text-align:center;
+}
+
+.logout{
+background:#fee2e2 !important;
+color:#991b1b !important;
+}
+
+.container{
+padding:25px 14px;
+}
+
+.page-title h1{
+font-size:27px;
+}
+
+.search-box input,
+.search-box select,
+.search-box button{
+width:100%;
+min-width:100%;
+}
+
+.add-btn{
+width:100%;
+text-align:center;
+}
+}
+</style>
 </head>
+
 <body>
 
-<!-- Header -->
-<div class="header">
-    <h2>Product List</h2>
+<div class="navbar">
+<div class="logo">🛒 SmartCart Admin</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<div class="nav-links" id="navMenu">
+<a href="/admin-dashboard">Dashboard</a>
+<a href="/admin/add-item">Add Product</a>
+<a href="/admin/item-list">View Products</a>
+<a href="/admin/profile">Profile</a>
+<a class="logout" href="/admin-logout">Logout</a>
+</div>
 </div>
 
 <div class="container">
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for msg_type, message in messages %}
-        <p class="msg">{{ message }}</p>
-      {% endfor %}
-    {% endwith %}
+<div class="page-title">
+<h1>Product List</h1>
+<p>Search, view, update and delete SmartCart products.</p>
+</div>
 
-    <!-- Search + Filter -->
-    <form method="GET" action="/admin/item-list" class="search-box">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for msg_type, message in messages %}
+<div class="flash {{ msg_type }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 
-        <input type="text"
-               name="search"
-               placeholder="Search product..."
-               value="{{ search }}">
+<form method="GET" action="/admin/item-list" class="search-box">
 
-        <select name="category">
-            <option value="">All Categories</option>
+<input type="text" name="search" placeholder="Search product..." value="{{ search }}">
 
-            {% for cat in categories %}
-            <option value="{{ cat.category }}"
-                {% if category == cat.category %}selected{% endif %}>
-                {{ cat.category }}
-            </option>
-            {% endfor %}
-        </select>
+<select name="category">
+<option value="">All Categories</option>
 
-        <button type="submit">Search</button>
+{% for cat in categories %}
+<option value="{{ cat.category }}" {% if category == cat.category %}selected{% endif %}>
+{{ cat.category }}
+</option>
+{% endfor %}
+</select>
 
-    </form>
+<button type="submit">Search</button>
 
-    <a class="add-btn" href="/admin/add-item">+ Add New Product</a>
+</form>
 
-    <!-- Table -->
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>View</th>
-            <th>Actions</th>
-        </tr>
+<a class="add-btn" href="/admin/add-item">+ Add New Product</a>
 
-        {% for product in products %}
-        <tr>
-            <td>{{ product.product_id }}</td>
+<div class="table-box">
+<table>
 
-            <td>
-                <img src="/static/uploads/product_images/{{ product.image }}" width="60">
-            </td>
+<tr>
+<th>ID</th>
+<th>Image</th>
+<th>Name</th>
+<th>Category</th>
+<th>Price</th>
+<th>Actions</th>
+</tr>
 
-            <td>{{ product.name }}</td>
-            <td>{{ product.category }}</td>
-            <td>₹{{ product.price }}</td>
+{% for product in products %}
+<tr>
+<td>{{ product.product_id }}</td>
 
-            <td>
-                <a class="view" href="/admin/view-item/{{ product.product_id }}">View</a>
-            </td>
+<td>
+<img class="product-img"
+src="/static/uploads/product_images/{{ product.image }}"
+alt="{{ product.name }}">
+</td>
 
-            <td>
-                <a class="update" href="/admin/update-item/{{ product.product_id }}">Update</a> |
-                <a class="delete"
-                   href="/admin/delete-item/{{ product.product_id }}"
-                   onclick="return confirm('Are you sure you want to delete this product?')">
-                   Delete
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
+<td>{{ product.name }}</td>
+<td>{{ product.category }}</td>
+<td>₹{{ product.price }}</td>
 
-    </table>
+<td>
+<div class="action-links">
 
-    <a class="back" href="/admin-dashboard">← Back To Dashboard</a>
+<a class="view"
+href="/admin/view-item/{{ product.product_id }}"
+title="View">👁</a>
+
+<a class="update"
+href="/admin/update-item/{{ product.product_id }}"
+title="Update">✏️</a>
+
+<a class="delete"
+href="/admin/delete-item/{{ product.product_id }}"
+onclick="return confirm('Are you sure you want to delete this product?')"
+title="Delete">🗑</a>
 
 </div>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+</div>
+
+<a class="back" href="/admin-dashboard">← Back To Dashboard</a>
+
+</div>
+
+<footer class="footer">
+© 2026 SmartCart. All Rights Reserved.
+</footer>
+
+<script>
+function toggleMenu(){
+document.getElementById("navMenu").classList.toggle("show");
+}
+</script>
 
 </body>
 </html>
