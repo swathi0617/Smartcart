@@ -375,10 +375,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # =================================================================
 # ROUTE 7: SHOW ADD PRODUCT PAGE (Protected Route)
 # =================================================================
+# =================================================================
+# ROUTE: ADD PRODUCT PAGE
+# =================================================================
 @app.route('/admin/add-item', methods=['GET'])
 def add_item_page():
 
-    # Only logged-in admin can access
     if 'admin_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/admin-login')
@@ -386,9 +388,8 @@ def add_item_page():
     return render_template("admin/add_item.html")
 
 
-
 # =================================================================
-# ROUTE 8: ADD PRODUCT INTO DATABASE
+# ROUTE: ADD PRODUCT INTO DATABASE
 # =================================================================
 @app.route('/admin/add-item', methods=['POST'])
 def add_item():
@@ -396,6 +397,8 @@ def add_item():
     if 'admin_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/admin-login')
+
+    admin_id = session['admin_id']
 
     name = request.form['name']
     description = request.form['description']
@@ -429,8 +432,8 @@ def add_item():
 
     cursor.execute("""
         INSERT INTO products 
-        (name, description, category, original_price, discount_percent, price, coins, image)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        (name, description, category, original_price, discount_percent, price, coins, image, admin_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         name,
         description,
@@ -439,7 +442,8 @@ def add_item():
         discount_percent,
         price,
         coins,
-        filename
+        filename,
+        admin_id
     ))
 
     conn.commit()
@@ -449,132 +453,9 @@ def add_item():
     flash("Product added successfully!", "success")
     return redirect('/admin/add-item')
 
-# =================================================================
-# ROUTE 9: DISPLAY ALL PRODUCTS (Admin)
-# ===============================================================
-
-#=================================================================
-# ROUTE 10: VIEW SINGLE PRODUCT DETAILS
-# =================================================================
-@app.route('/admin/view-item/<int:item_id>')
-def view_item(item_id):
-
-    # Check admin session
-    if 'admin_id' not in session:
-        flash("Please login first!", "danger")
-        return redirect('/admin-login')
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM products WHERE product_id = ?", (item_id,))
-    product = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    if not product:
-        flash("Product not found!", "danger")
-        return redirect('/admin/item-list')
-
-    return render_template("admin/view_item.html", product=product)
-
 
 # =================================================================
-# ROUTE 11: SHOW UPDATE FORM WITH EXISTING DATA
-# =================================================================
-@app.route('/admin/update-item/<int:item_id>', methods=['GET'])
-def update_item_page(item_id):
-
-    # Check login
-    if 'admin_id' not in session:
-        flash("Please login!", "danger")
-        return redirect('/admin-login')
-
-    # Fetch product data
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM products WHERE product_id = ?", (item_id,))
-    product = cursor.fetchone()
-
-    cursor.close()
-    conn.close()
-
-    if not product:
-        flash("Product not found!", "danger")
-        return redirect('/admin/item-list')
-
-    return render_template("admin/update_item.html", product=product)
-
-# =================================================================
-# ROUTE-12: UPDATE PRODUCT + OPTIONAL IMAGE REPLACE
-# =================================================================
-@app.route('/admin/update-item/<int:item_id>', methods=['POST'])
-def update_item(item_id):
-
-    if 'admin_id' not in session:
-        flash("Please login!", "danger")
-        return redirect('/admin-login')
-
-    # 1️⃣ Get updated form data
-    name = request.form['name']
-    description = request.form['description']
-    category = request.form['category']
-    price = request.form['price']
-
-    new_image = request.files['image']
-
-    # 2️⃣ Fetch old product data
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM products WHERE product_id = ?", (item_id,))
-    product = cursor.fetchone()
-
-    if not product:
-        flash("Product not found!", "danger")
-        return redirect('/admin/item-list')
-
-    old_image_name = product['image']
-
-    # 3️⃣ If admin uploaded a new image → replace it
-    if new_image and new_image.filename != "":
-
-        # Secure filename
-        from werkzeug.utils import secure_filename
-        new_filename = secure_filename(new_image.filename)
-
-        # Save new image
-        new_image_path = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
-        new_image.save(new_image_path)
-
-        # Delete old image file
-        old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], old_image_name)
-        if os.path.exists(old_image_path):
-            os.remove(old_image_path)
-
-        final_image_name = new_filename
-
-    else:
-        # No new image uploaded → keep old one
-        final_image_name = old_image_name
-
-    # 4️⃣ Update product in the database
-    cursor.execute("""
-        UPDATE products
-        SET name=?, description=?, category=?, price=?, image=?
-        WHERE product_id=?
-    """, (name, description, category, price, final_image_name, item_id))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    flash("Product updated successfully!", "success")
-    return redirect('/admin/item-list')
-
-# =================================================================
-# ROUTE 13: UPDATED PRODUCT LIST WITH SEARCH + CATEGORY FILTER
+# ROUTE: ADMIN ITEM LIST - ONLY CURRENT ADMIN PRODUCTS
 # =================================================================
 @app.route('/admin/item-list')
 def item_list():
@@ -583,39 +464,30 @@ def item_list():
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
-    search = request.args.get('search', '')
-    category_filter = request.args.get('category', '')
+    admin_id = session['admin_id']
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT DISTINCT category FROM products")
-    categories = cursor.fetchall()
+    cursor.execute("""
+        SELECT *
+        FROM products
+        WHERE admin_id = ?
+        ORDER BY product_id DESC
+    """, (admin_id,))
 
-    query = "SELECT * FROM products WHERE 1=1"
-    params = []
-
-    if search:
-        query += " AND name LIKE ?"
-        params.append("%" + search + "%")
-
-    if category_filter:
-        query += " AND category = ?"
-        params.append(category_filter)
-
-    cursor.execute(query, params)
     products = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
-    return render_template(
-        "admin/item_list.html",
-        products=products,
-        categories=categories
-    )
+    return render_template("admin/item_list.html", products=products)
 # =================================================================
-# ROUTE 14: DELETE PRODUCT
+# ROUTE 9: DISPLAY ALL PRODUCTS (Admin)
+# ===============================================================
+
+#=================================================================
+# ROUTE 10: VIEW SINGLE PRODUCT DETAILS
 # =================================================================
 @app.route('/admin/delete-item/<int:item_id>')
 def delete_item(item_id):
@@ -648,6 +520,8 @@ def delete_item(item_id):
 
     flash("Product deleted successfully!", "success")
     return redirect('/admin/item-list')
+
+
 #==========================================================
 # add admin profile
 #==========================================================
