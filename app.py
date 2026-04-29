@@ -665,20 +665,22 @@ def user_register():
 # =================================================================
 # ROUTE: USER LOGIN
 # =================================================================
+# =================================================================
+# USER LOGIN
+# =================================================================
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/user-login', methods=['GET', 'POST'])
 def user_login():
 
-    # Open login page
+    # Open Login Page
     if request.method == 'GET':
-        session.pop('_flashes', None)
         return render_template("user/user_login.html")
 
-    # Form values
+    # Get Form Data
     email = request.form.get('email', '').strip()
     password = request.form.get('password', '').strip()
 
-    # Empty validation
+    # Empty Validation
     if not email or not password:
         flash("Please enter email and password!", "danger")
         return redirect('/user-login')
@@ -692,25 +694,32 @@ def user_login():
     cursor.close()
     conn.close()
 
-    # Email not found
+    # Email Not Found
     if not user:
         flash("Email not found! Please register.", "danger")
         return redirect('/user-login')
 
-    # Password wrong
+    # Wrong Password
     if not check_password(password, user['password']):
         flash("Incorrect password!", "danger")
         return redirect('/user-login')
 
+    # Store values first
+    user_id = user['user_id']
+    user_name = user['name']
+    user_email = user['email']
+
     # Clear old session
     session.clear()
 
-    # New session
-    session['user_id'] = user['user_id']
-    session['user_name'] = user['name']
-    session['user_email'] = user['email']
+    # Create new session
+    session['user_id'] = user_id
+    session['user_name'] = user_name
+    session['user_email'] = user_email
 
+    # Success Message
     flash("Login successful!", "success")
+
     return redirect('/user-dashboard')
 #============== forgot password==========
 @app.route('/user/forgot-password', methods=['GET', 'POST'])
@@ -818,6 +827,9 @@ def user_reset_password_page(token):
 # =================================================================
 # ROUTE: USER DASHBOARD
 # =================================================================
+# =================================================================
+# USER DASHBOARD
+# =================================================================
 @app.route('/user-dashboard')
 def user_dashboard():
 
@@ -830,25 +842,37 @@ def user_dashboard():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Cart Count
     cursor.execute("""
-        SELECT COALESCE(SUM(quantity),0) AS cart_count
+        SELECT COALESCE(SUM(quantity), 0) AS cart_count
         FROM cart
-        WHERE user_id=?
+        WHERE user_id = ?
     """, (user_id,))
-    cart_count = cursor.fetchone()['cart_count']
+    cart_row = cursor.fetchone()
+    cart_count = cart_row['cart_count'] if cart_row else 0
 
+    # Saved Amount
     cursor.execute("""
-        SELECT COALESCE(SUM(MAX(p.original_price - p.price, 0) * c.quantity),0) AS saved_amount
+        SELECT COALESCE(SUM(
+            CASE
+                WHEN p.original_price > p.price
+                THEN (p.original_price - p.price) * c.quantity
+                ELSE 0
+            END
+        ), 0) AS saved_amount
         FROM cart c
         JOIN products p ON c.product_id = p.product_id
-        WHERE c.user_id=?
+        WHERE c.user_id = ?
     """, (user_id,))
-    saved_amount = cursor.fetchone()['saved_amount']
+    saved_row = cursor.fetchone()
+    saved_amount = saved_row['saved_amount'] if saved_row else 0
 
+    # Categories
     cursor.execute("""
         SELECT DISTINCT category
         FROM products
-        WHERE category IS NOT NULL AND category!=''
+        WHERE category IS NOT NULL
+        AND category != ''
         ORDER BY category ASC
     """)
     categories = cursor.fetchall()
@@ -858,9 +882,9 @@ def user_dashboard():
 
     return render_template(
         "user/user_home.html",
-        user_name=session.get("user_name", "User"),
+        user_name=session.get('user_name', 'User'),
         cart_count=cart_count,
-        saved_amount=saved_amount,
+        saved_amount=round(saved_amount, 2),
         member_since=2026,
         categories=categories
     )
@@ -954,45 +978,61 @@ def user_product_details(product_id):
 # =================================================================
 # ADD ITEM TO CART
 # =================================================================
+# =================================================================
+# ADD TO CART
+# =================================================================
 @app.route('/user/add-to-cart/<int:product_id>')
 def add_to_cart(product_id):
 
+    # Login Check
     if 'user_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/user-login')
 
     user_id = session['user_id']
 
+    # Which page should return after add cart
+    next_page = request.args.get('next')
+
+    if not next_page:
+        next_page = request.referrer or '/user/products'
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Check Product Already in Cart
     cursor.execute("""
         SELECT *
         FROM cart
-        WHERE user_id=? AND product_id=?
+        WHERE user_id = ? AND product_id = ?
     """, (user_id, product_id))
 
     item = cursor.fetchone()
 
+    # If Exists -> Increase Quantity
     if item:
         cursor.execute("""
             UPDATE cart
             SET quantity = quantity + 1
-            WHERE user_id=? AND product_id=?
+            WHERE user_id = ? AND product_id = ?
         """, (user_id, product_id))
+
+    # Else -> Insert New Item
     else:
         cursor.execute("""
-            INSERT INTO cart(user_id, product_id, quantity)
-            VALUES(?, ?, 1)
+            INSERT INTO cart (user_id, product_id, quantity)
+            VALUES (?, ?, 1)
         """, (user_id, product_id))
 
     conn.commit()
     cursor.close()
     conn.close()
 
+    # Success Flash Message
     flash("Item added to cart successfully!", "success")
-    return redirect(request.referrer)
 
+    # Return Same Page
+    return redirect(next_page)
 # =================================================================
 # VIEW CART PAGE
 # =================================================================
