@@ -1,44 +1,277 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Update Product</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Update Product - SmartCart</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f4f7fb;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Navbar */
+.navbar{
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.nav-links{
+    display:flex;
+    gap:15px;
+}
+
+.nav-links a{
+    color:white;
+    text-decoration:none;
+    padding:8px 12px;
+    border-radius:6px;
+    font-weight:600;
+}
+
+.nav-links a:hover{
+    background:rgba(255,255,255,0.2);
+}
+
+.menu-toggle{
+    display:none;
+    font-size:28px;
+    cursor:pointer;
+}
+
+/* Main */
+.container{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px 15px;
+}
+
+.form-card{
+    width:100%;
+    max-width:520px;
+    background:white;
+    padding:28px;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.12);
+}
+
+.form-card h2{
+    text-align:center;
+    color:#1e3a8a;
+    margin-bottom:22px;
+}
+
+.flash{
+    background:#dcfce7;
+    color:#166534;
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:15px;
+    text-align:center;
+    font-weight:bold;
+}
+
+label{
+    font-weight:bold;
+    color:#111827;
+}
+
+input,
+textarea{
+    width:100%;
+    margin-top:7px;
+    margin-bottom:15px;
+    padding:12px;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+}
+
+textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+input:focus,
+textarea:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.old-image{
+    width:150px;
+    height:120px;
+    object-fit:contain;
+    background:#eef3ff;
+    border-radius:12px;
+    padding:8px;
+    margin:10px 0 15px;
+    display:block;
+}
+
+.btn{
+    width:100%;
+    border:none;
+    padding:13px;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#1e40af;
+}
+
+.back-link{
+    display:block;
+    text-align:center;
+    margin-top:18px;
+    text-decoration:none;
+    color:#111827;
+    font-weight:bold;
+}
+
+/* Footer */
+.footer{
+    background:#111827;
+    color:white;
+    text-align:center;
+    padding:16px;
+    margin-top:auto;
+}
+
+/* Mobile */
+@media(max-width:768px){
+    .navbar{
+        flex-wrap:wrap;
+    }
+
+    .menu-toggle{
+        display:block;
+    }
+
+    .nav-links{
+        display:none;
+        flex-direction:column;
+        width:100%;
+        background:#1e40af;
+        margin-top:12px;
+        border-radius:10px;
+        overflow:hidden;
+    }
+
+    .nav-links.show{
+        display:flex;
+    }
+
+    .nav-links a{
+        padding:12px;
+        border-bottom:1px solid rgba(255,255,255,0.2);
+    }
+
+    .form-card{
+        padding:22px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-<h2>Update Product</h2>
+<div class="navbar">
+    <div class="logo">SmartCart</div>
 
-<!-- Flash Messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <p style="color:green;">{{ message }}</p>
-  {% endfor %}
-{% endwith %}
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
-<form method="POST" action="/admin/update-item/{{ product.product_id }}" enctype="multipart/form-data">
+    <div class="nav-links" id="navLinks">
+        <a href="/admin-dashboard">Dashboard</a>
+        <a href="/admin/add-item">Add Product</a>
+        <a href="/admin/item-list">Products</a>
+        <a href="/admin/logout">Logout</a>
+    </div>
+</div>
 
-    <label>Product Name:</label><br>
-    <input type="text" name="name" value="{{ product.name }}" required><br><br>
+<div class="container">
 
-    <label>Description:</label><br>
-    <textarea name="description" required>{{ product.description }}</textarea><br><br>
+    <div class="form-card">
 
-    <label>Category:</label><br>
-    <input type="text" name="category" value="{{ product.category }}" required><br><br>
+        <h2>Update Product</h2>
 
-    <label>Price:</label><br>
-    <input type="number" step="0.01" name="price" value="{{ product.price }}" required><br><br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
-    <label>Old Image:</label><br>
-    <img src="/static/uploads/product_images/{{ product.image }}" width="120"><br><br>
+        <form method="POST" action="/admin/update-item/{{ product.product_id }}" enctype="multipart/form-data">
 
-    <label>Choose New Image (Optional):</label><br>
-    <input type="file" name="image" accept="image/*"><br><br>
+            <label>Product Name</label>
+            <input type="text" name="name" value="{{ product.name }}" required>
 
-    <button type="submit">Update Product</button>
-</form>
+            <label>Description</label>
+            <textarea name="description" required>{{ product.description }}</textarea>
 
-<br>
-<a href="/admin/item-list">Back to Product List</a>
+            <label>Category</label>
+            <input type="text" name="category" value="{{ product.category }}" required>
+
+            <label>Original Price</label>
+            <input type="number" step="0.01" name="original_price" value="{{ product.original_price }}" required>
+
+            <label>Discount Percent</label>
+            <input type="number" name="discount_percent" value="{{ product.discount_percent }}" required>
+
+            <label>Old Image</label>
+            <img class="old-image" src="/static/uploads/product_images/{{ product.image }}" alt="Product Image">
+
+            <label>Choose New Image Optional</label>
+            <input type="file" name="image" accept="image/*">
+
+            <button type="submit" class="btn">Update Product</button>
+
+        </form>
+
+        <a href="/admin/item-list" class="back-link">← Back to Product List</a>
+
+    </div>
+
+</div>
+
+<div class="footer">
+    © 2026 SmartCart | All Rights Reserved
+</div>
+
+<script>
+function toggleMenu(){
+    document.getElementById("navLinks").classList.toggle("show");
+}
+</script>
 
 </body>
 </html>
