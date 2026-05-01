@@ -17,13 +17,27 @@ razorpay_client = razorpay.Client(
     auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
 )
 app.secret_key = config.SECRET_KEY
+
+def init_db():
+    conn = sqlite3.connect("smartcart.db")  # mee DB name database.db aithe database.db pettu
+    cursor = conn.cursor()
+
+    cursor.execute("PRAGMA table_info(products)")
+    columns = [col[1] for col in cursor.fetchall()]
+
+    if "admin_id" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN admin_id INTEGER")
+
+    conn.commit()
+    conn.close()
+
 serializer = URLSafeTimedSerializer(app.secret_key)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'swathisampatam68@gmail.com'
-app.config['MAIL_PASSWORD'] = 'paig xatr gdlx xihc'
+app.config['MAIL_PASSWORD'] ='sgii phfa qeyf mais'
 app.config['MAIL_DEFAULT_SENDER'] = 'swathisampatam2004@gmail.com'
 
 mail = Mail(app)
@@ -278,6 +292,9 @@ def admin_login():
 #==================================================================
 # forgot paaword route
 #==================================================================
+# =============================================================
+# Admin Forgot Password
+# =============================================================
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def admin_forgot_password():
 
@@ -285,6 +302,10 @@ def admin_forgot_password():
         return render_template("admin/forgot_password.html")
 
     email = request.form.get('email', '').strip()
+
+    if not email:
+        flash("Please enter email!", "danger")
+        return redirect('/forgot-password')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -299,13 +320,43 @@ def admin_forgot_password():
         flash("Admin email not found!", "danger")
         return redirect('/forgot-password')
 
-    flash("Reset link sent to admin email!", "success")
+    token = serializer.dumps(email, salt='reset-password')
+    reset_link = url_for('reset_password', token=token, _external=True)
+
+    msg = Message(
+        subject="SmartCart Admin Password Reset",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
+
+    msg.body = f"""
+Hello Admin,
+
+Click this link to reset your password:
+
+{reset_link}
+
+This link will expire in 10 minutes.
+
+SmartCart Team
+"""
+
+    try:
+        mail.send(msg)
+        flash("Reset link sent to admin email!", "success")
+    except Exception as e:
+        print("MAIL ERROR:", e)
+        flash(f"Mail not sent: {e}", "danger")
+
     return redirect('/forgot-password')
-#=============================================================
-#reset_password
-#===============================================================
+
+
+# =============================================================
+# Admin Reset Password
+# =============================================================
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+
     try:
         email = serializer.loads(token, salt='reset-password', max_age=600)
     except:
@@ -313,8 +364,8 @@ def reset_password(token):
         return redirect('/admin-login')
 
     if request.method == 'POST':
-        password = request.form['password']
-        confirm = request.form['confirm_password']
+        password = request.form.get('password')
+        confirm = request.form.get('confirm_password')
 
         if password != confirm:
             flash("Passwords do not match", "danger")
@@ -324,10 +375,12 @@ def reset_password(token):
 
         conn = get_db_connection()
         cursor = conn.cursor()
+
         cursor.execute(
-            "UPDATE admin SET password=? WHERE email=?",
+            "UPDATE admin SET password = ? WHERE email = ?",
             (hashed, email)
         )
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -335,7 +388,7 @@ def reset_password(token):
         flash("Password updated successfully!", "success")
         return redirect(url_for('admin_login'))
 
-    return render_template('admin/reset_password.html')
+    return render_template('admin/reset_password.html', token=token)
 
 # =================================================================
 # ROUTE 5: ADMIN DASHBOARD (PROTECTED ROUTE)
@@ -391,12 +444,15 @@ def add_item_page():
 # =================================================================
 # ROUTE: ADD PRODUCT INTO DATABASE
 # =================================================================
-@app.route('/admin/add-item', methods=['POST'])
+@app.route('/admin/add-item', methods=['GET', 'POST'])
 def add_item():
 
     if 'admin_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/admin-login')
+
+    if request.method == 'GET':
+        return render_template('admin/add_item.html')
 
     admin_id = session['admin_id']
 
@@ -429,6 +485,14 @@ def add_item():
 
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # admin_id column lekapothe add chestundi
+    cursor.execute("PRAGMA table_info(products)")
+    columns = [col[1] for col in cursor.fetchall()]
+
+    if "admin_id" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN admin_id INTEGER")
+        conn.commit()
 
     cursor.execute("""
         INSERT INTO products 
@@ -466,26 +530,170 @@ def item_list():
 
     admin_id = session['admin_id']
 
+    # GET values (search & category)
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Base query
+    query = "SELECT * FROM products WHERE admin_id = ?"
+    values = [admin_id]
+
+    # Search filter
+    if search:
+        query += " AND name LIKE ?"
+        values.append(f"%{search}%")
+
+    # Category filter
+    if category:
+        query += " AND category = ?"
+        values.append(category)
+
+    query += " ORDER BY product_id DESC"
+
+    cursor.execute(query, values)
+    products = cursor.fetchall()
+
+    # Categories dropdown kosam
+    cursor.execute("""
+        SELECT DISTINCT category 
+        FROM products 
+        WHERE admin_id = ? 
+        AND category IS NOT NULL 
+        AND category != ''
+        ORDER BY category
+    """, (admin_id,))
+    
+    categories = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "admin/item_list.html",
+        products=products,
+        categories=categories,
+        search=search,
+        selected_category=category
+    )
+# =================================================================
+# ROUTE 9: view items 
+# ===============================================================
+@app.route('/admin/view-item/<int:product_id>')
+def view_item(product_id):
+
+    if 'admin_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/admin-login')
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         SELECT *
         FROM products
-        WHERE admin_id = ?
-        ORDER BY product_id DESC
-    """, (admin_id,))
+        WHERE product_id = ?
+        AND admin_id = ?
+    """, (product_id, session['admin_id']))
 
-    products = cursor.fetchall()
+    product = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
-    return render_template("admin/item_list.html", products=products)
-# =================================================================
-# ROUTE 9: DISPLAY ALL PRODUCTS (Admin)
-# ===============================================================
+    if not product:
+        flash("Product not found!", "danger")
+        return redirect('/admin/item-list')
 
+    return render_template("admin/view_item.html", product=product)
+#==================update item========================
+@app.route('/admin/update-item/<int:product_id>', methods=['GET', 'POST'])
+def update_item(product_id):
+
+    if 'admin_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/admin-login')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # GET → show form
+    if request.method == 'GET':
+
+        cursor.execute("""
+            SELECT *
+            FROM products
+            WHERE product_id = ?
+            AND admin_id = ?
+        """, (product_id, session['admin_id']))
+
+        product = cursor.fetchone()
+
+        if not product:
+            flash("Product not found!", "danger")
+            return redirect('/admin/item-list')
+
+        cursor.close()
+        conn.close()
+
+        return render_template("admin/update_item.html", product=product)
+
+    # POST → update product
+    name = request.form['name']
+    description = request.form['description']
+    category = request.form['category']
+
+    original_price = float(request.form['original_price'])
+    discount_percent = int(request.form['discount_percent'])
+
+    discount_amount = original_price * discount_percent / 100
+    price = original_price - discount_amount
+
+    if price >= 1000:
+        coins = 100
+    elif price >= 500:
+        coins = 50
+    else:
+        coins = 0
+
+    image_file = request.files['image']
+
+    if image_file and image_file.filename != "":
+        filename = secure_filename(image_file.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image_file.save(image_path)
+
+        cursor.execute("""
+            UPDATE products
+            SET name=?, description=?, category=?, original_price=?,
+                discount_percent=?, price=?, coins=?, image=?
+            WHERE product_id=? AND admin_id=?
+        """, (
+            name, description, category, original_price,
+            discount_percent, price, coins, filename,
+            product_id, session['admin_id']
+        ))
+
+    else:
+        cursor.execute("""
+            UPDATE products
+            SET name=?, description=?, category=?, original_price=?,
+                discount_percent=?, price=?, coins=?
+            WHERE product_id=? AND admin_id=?
+        """, (
+            name, description, category, original_price,
+            discount_percent, price, coins,
+            product_id, session['admin_id']
+        ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    flash("Product updated successfully!", "success")
+    return redirect('/admin/item-list')
 #=================================================================
 # ROUTE 10: VIEW SINGLE PRODUCT DETAILS
 # =================================================================
@@ -662,9 +870,7 @@ def user_register():
 
     flash("Registration successful! Please login.", "success")
     return redirect('/user-login')
-# =================================================================
-# ROUTE: USER LOGIN
-# =================================================================
+
 # =================================================================
 # USER LOGIN
 # =================================================================
@@ -1946,8 +2152,9 @@ def update_order_status(order_id):
     flash("Order status updated successfully!", "success")
     return redirect(f"/admin/order/{order_id}")
 
+init_db()
 # ------------------------ RUN SERVER -----------------------
+
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
     
