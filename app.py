@@ -528,18 +528,16 @@ def item_list():
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
-    admin_id = session['admin_id']
-
-    # GET values (search & category)
+    # GET values
     search = request.args.get('search', '').strip()
     category = request.args.get('category', '').strip()
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Base query
-    query = "SELECT * FROM products WHERE admin_id = ?"
-    values = [admin_id]
+    # Base query - all products
+    query = "SELECT * FROM products WHERE 1=1"
+    values = []
 
     # Search filter
     if search:
@@ -556,16 +554,14 @@ def item_list():
     cursor.execute(query, values)
     products = cursor.fetchall()
 
-    # Categories dropdown kosam
+    # Categories dropdown - all categories
     cursor.execute("""
-        SELECT DISTINCT category 
-        FROM products 
-        WHERE admin_id = ? 
-        AND category IS NOT NULL 
+        SELECT DISTINCT category
+        FROM products
+        WHERE category IS NOT NULL
         AND category != ''
         ORDER BY category
-    """, (admin_id,))
-    
+    """)
     categories = cursor.fetchall()
 
     cursor.close()
@@ -621,32 +617,31 @@ def update_item(product_id):
 
     # GET → show form
     if request.method == 'GET':
-
         cursor.execute("""
             SELECT *
             FROM products
             WHERE product_id = ?
-            AND admin_id = ?
-        """, (product_id, session['admin_id']))
+        """, (product_id,))
 
         product = cursor.fetchone()
 
         if not product:
+            cursor.close()
+            conn.close()
             flash("Product not found!", "danger")
             return redirect('/admin/item-list')
 
         cursor.close()
         conn.close()
-
         return render_template("admin/update_item.html", product=product)
 
     # POST → update product
-    name = request.form['name']
-    description = request.form['description']
-    category = request.form['category']
+    name = request.form.get('name')
+    description = request.form.get('description')
+    category = request.form.get('category')
 
-    original_price = float(request.form['original_price'])
-    discount_percent = int(request.form['discount_percent'])
+    original_price = float(request.form.get('original_price'))
+    discount_percent = int(request.form.get('discount_percent'))
 
     discount_amount = original_price * discount_percent / 100
     price = original_price - discount_amount
@@ -658,7 +653,7 @@ def update_item(product_id):
     else:
         coins = 0
 
-    image_file = request.files['image']
+    image_file = request.files.get('image')
 
     if image_file and image_file.filename != "":
         filename = secure_filename(image_file.filename)
@@ -667,25 +662,38 @@ def update_item(product_id):
 
         cursor.execute("""
             UPDATE products
-            SET name=?, description=?, category=?, original_price=?,
-                discount_percent=?, price=?, coins=?, image=?
-            WHERE product_id=? AND admin_id=?
+            SET name = ?,
+                description = ?,
+                category = ?,
+                original_price = ?,
+                discount_percent = ?,
+                price = ?,
+                coins = ?,
+                image = ?
+            WHERE product_id = ?
         """, (
-            name, description, category, original_price,
-            discount_percent, price, coins, filename,
-            product_id, session['admin_id']
+            name, description, category,
+            original_price, discount_percent,
+            price, coins, filename,
+            product_id
         ))
 
     else:
         cursor.execute("""
             UPDATE products
-            SET name=?, description=?, category=?, original_price=?,
-                discount_percent=?, price=?, coins=?
-            WHERE product_id=? AND admin_id=?
+            SET name = ?,
+                description = ?,
+                category = ?,
+                original_price = ?,
+                discount_percent = ?,
+                price = ?,
+                coins = ?
+            WHERE product_id = ?
         """, (
-            name, description, category, original_price,
-            discount_percent, price, coins,
-            product_id, session['admin_id']
+            name, description, category,
+            original_price, discount_percent,
+            price, coins,
+            product_id
         ))
 
     conn.commit()
