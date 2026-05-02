@@ -591,8 +591,7 @@ def view_item(product_id):
         SELECT *
         FROM products
         WHERE product_id = ?
-        AND admin_id = ?
-    """, (product_id, session['admin_id']))
+    """, (product_id,))
 
     product = cursor.fetchone()
 
@@ -1205,12 +1204,6 @@ def add_to_cart(product_id):
 
     user_id = session['user_id']
 
-    # Which page should return after add cart
-    next_page = request.args.get('next')
-
-    if not next_page:
-        next_page = request.referrer or '/user/products'
-
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -1242,11 +1235,11 @@ def add_to_cart(product_id):
     cursor.close()
     conn.close()
 
-    # Success Flash Message
+    # Flash Message
     flash("Item added to cart successfully!", "success")
 
-    # Return Same Page
-    return redirect(next_page)
+    # 👉 Always return same page clean ga
+    return redirect(request.referrer or '/user/products')
 # =================================================================
 # VIEW CART PAGE
 # =================================================================
