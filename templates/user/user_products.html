@@ -97,6 +97,25 @@ body{
     background:#f97316;
 }
 
+/* FLASH */
+.flash-msg{
+    max-width:600px;
+    margin:15px auto 0;
+    padding:12px;
+    text-align:center;
+    border-radius:10px;
+    font-weight:bold;
+    background:#dcfce7;
+    color:#166534;
+    animation:fadeOut 3s forwards;
+}
+
+@keyframes fadeOut{
+    0%{opacity:1;}
+    80%{opacity:1;}
+    100%{opacity:0;visibility:hidden;}
+}
+
 /* MAIN */
 .main-content{
     flex:1;
@@ -228,24 +247,6 @@ button{
     color:#16a34a;
 }
 
-.old-price{
-    color:#94a3b8;
-    text-decoration:line-through;
-    font-size:15px;
-}
-
-.discount{
-    color:#059669;
-    font-size:14px;
-    font-weight:bold;
-}
-
-.save{
-    color:#2563eb;
-    font-size:13px;
-    font-weight:bold;
-}
-
 .btn-row{
     display:flex;
     gap:10px;
@@ -331,7 +332,6 @@ button{
         font-size:14px;
     }
 
-    /* SEARCH + FILTER SIDE BY SIDE */
     .top-section{
         grid-template-columns:1fr;
         gap:12px;
@@ -357,7 +357,6 @@ button{
         font-size:22px;
     }
 
-    /* 2 PRODUCTS IN MOBILE */
     .product-container{
         grid-template-columns:repeat(2,1fr);
         gap:10px;
@@ -438,6 +437,14 @@ button{
     </div>
 </div>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="flash-msg">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
 <div class="main-content">
 
     <div class="page-hero">
@@ -478,7 +485,7 @@ button{
         <div class="product-card">
 
             <div class="product-image-box">
-                <img src="/static/uploads/product_images/{{ product.image }}" alt="">
+                <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}">
             </div>
 
             <h3>{{ product.name }}</h3>
@@ -489,7 +496,11 @@ button{
 
             <div class="btn-row">
                 <a href="/user/product/{{ product.product_id }}" class="view-btn">View</a>
-                <a href="/user/add-to-cart/{{ product.product_id }}" class="cart-small-btn">Add Cart</a>
+
+                <a href="{{ url_for('add_to_cart', product_id=product.product_id) }}" 
+                   class="cart-small-btn">
+                   Add Cart
+                </a>
             </div>
 
         </div>
