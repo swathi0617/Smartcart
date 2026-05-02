@@ -59,9 +59,7 @@ body{
     color:#fb923c;
 }
 
-#menu-toggle{
-    display:none;
-}
+#menu-toggle{ display:none; }
 
 .menu-icon{
     display:none;
@@ -87,6 +85,35 @@ body{
 .nav-links a:hover,
 .active-btn{
     background:#f97316;
+}
+
+/* FLASH MESSAGE */
+.flash-msg{
+    max-width:650px;
+    margin:20px auto 0;
+    padding:12px;
+    text-align:center;
+    border-radius:10px;
+    font-weight:bold;
+    background:#dcfce7;
+    color:#166534;
+    animation:fadeOut 3s forwards;
+}
+
+.flash-msg.danger{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.flash-msg.success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+@keyframes fadeOut{
+    0%{opacity:1;}
+    80%{opacity:1;}
+    100%{opacity:0;visibility:hidden;}
 }
 
 /* MAIN */
@@ -342,6 +369,15 @@ td{
     </div>
 </div>
 
+<!-- FLASH MESSAGE -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
 <div class="main-content">
 
 <div class="success-container">
@@ -375,7 +411,6 @@ td{
     <div class="items-list">
         <h3>Order Summary</h3>
 
-        <!-- Desktop table -->
         <div class="table-box">
             <table>
                 <tr>
@@ -394,7 +429,6 @@ td{
             </table>
         </div>
 
-        <!-- Mobile cart style -->
         <div class="mobile-items">
             {% for it in items %}
             <div class="mobile-card">
