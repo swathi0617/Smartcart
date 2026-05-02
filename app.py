@@ -1289,6 +1289,11 @@ def user_cart():
 
 @app.route('/user/cart/increase/<int:product_id>')
 def increase_cart(product_id):
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
     user_id = session['user_id']
 
     conn = get_db_connection()
@@ -1304,21 +1309,46 @@ def increase_cart(product_id):
     cursor.close()
     conn.close()
 
+    flash("Item quantity increased!", "success")
     return redirect('/user/cart')
-#====================cart decrease===========================
-
+#--------------decrease-----------------------
 @app.route('/user/cart/decrease/<int:product_id>')
 def decrease_cart(product_id):
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
     user_id = session['user_id']
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Check current quantity
     cursor.execute("""
-        UPDATE cart
-        SET quantity = quantity - 1
-        WHERE user_id = ? AND product_id = ? AND quantity > 1
+        SELECT quantity FROM cart
+        WHERE user_id = ? AND product_id = ?
     """, (user_id, product_id))
+
+    item = cursor.fetchone()
+
+    if item:
+        if item['quantity'] > 1:
+            cursor.execute("""
+                UPDATE cart
+                SET quantity = quantity - 1
+                WHERE user_id = ? AND product_id = ?
+            """, (user_id, product_id))
+
+            flash("Item quantity decreased!", "success")
+
+        else:
+            cursor.execute("""
+                DELETE FROM cart
+                WHERE user_id = ? AND product_id = ?
+            """, (user_id, product_id))
+
+            flash("Item removed from cart!", "danger")
 
     conn.commit()
     cursor.close()
@@ -1329,6 +1359,11 @@ def decrease_cart(product_id):
 
 @app.route('/user/cart/remove/<int:product_id>')
 def remove_cart(product_id):
+
+    if 'user_id' not in session:
+        flash("Please login first!", "danger")
+        return redirect('/user-login')
+
     user_id = session['user_id']
 
     conn = get_db_connection()
@@ -1343,9 +1378,8 @@ def remove_cart(product_id):
     cursor.close()
     conn.close()
 
+    flash("Item removed successfully!", "success")
     return redirect('/user/cart')
-USERS_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads/user_profiles')
-app.config['USERS_UPLOAD_FOLDER'] = USERS_UPLOAD_FOLDER
 #---------------------checkout select------------------------
 @app.route('/checkout-selected', methods=['POST'])
 def checkout_selected():
@@ -1366,6 +1400,9 @@ def checkout_selected():
     return redirect('/add-address')
 # ==========================================================
 # SHOW USER PROFILE
+# ==========================================================
+# ==========================================================
+# USER PROFILE
 # ==========================================================
 @app.route('/user/profile', methods=['GET'])
 def user_profile():
@@ -1400,16 +1437,22 @@ def user_profile_update():
 
     user_id = session['user_id']
 
-    name = request.form['name']
-    email = request.form['email']
-    new_password = request.form['password']
-    new_image = request.files['profile_image']
+    name = request.form.get('name')
+    email = request.form.get('email')
+    new_password = request.form.get('password')
+    new_image = request.files.get('profile_image')
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
     user = cursor.fetchone()
+
+    if not user:
+        cursor.close()
+        conn.close()
+        flash("User not found!", "danger")
+        return redirect('/user-login')
 
     old_image_name = user['profile_image'] if 'profile_image' in user.keys() else ''
 
@@ -1425,18 +1468,11 @@ def user_profile_update():
 
         filename = secure_filename(new_image.filename)
 
-        image_path = os.path.join(
-            app.config['USERS_UPLOAD_FOLDER'],
-            filename
-        )
+        image_path = os.path.join(app.config['USERS_UPLOAD_FOLDER'], filename)
         new_image.save(image_path)
 
-        # delete old image
         if old_image_name:
-            old_path = os.path.join(
-                app.config['USERS_UPLOAD_FOLDER'],
-                old_image_name
-            )
+            old_path = os.path.join(app.config['USERS_UPLOAD_FOLDER'], old_image_name)
             if os.path.exists(old_path):
                 os.remove(old_path)
 
@@ -1444,7 +1480,6 @@ def user_profile_update():
     else:
         final_image_name = old_image_name
 
-    # Update DB
     cursor.execute("""
         UPDATE users
         SET name=?, email=?, password=?, profile_image=?
@@ -1455,7 +1490,6 @@ def user_profile_update():
     cursor.close()
     conn.close()
 
-    # Update session
     session['user_name'] = name
     session['user_email'] = email
 
@@ -1529,12 +1563,16 @@ def payment_success():
         order_id=order_id
     )
 
+
 # ================= ADD ADDRESS =================
 @app.route('/add-address', methods=['GET', 'POST'])
 def add_address():
+
     if 'user_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/user-login')
+
+    user_id = session['user_id']
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1551,24 +1589,21 @@ def add_address():
             INSERT INTO addresses 
             (user_id, full_name, phone, address, city, state, pincode)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (
-            session['user_id'],
-            full_name,
-            phone,
-            address,
-            city,
-            state,
-            pincode
-        ))
+        """, (user_id, full_name, phone, address, city, state, pincode))
 
         conn.commit()
+        cursor.close()
+        conn.close()
+
         flash("Address added successfully!", "success")
         return redirect('/add-address')
 
-    cursor.execute(
-        "SELECT * FROM addresses WHERE user_id=? ORDER BY id DESC",
-        (session['user_id'],)
-    )
+    cursor.execute("""
+        SELECT * FROM addresses
+        WHERE user_id = ?
+        ORDER BY id DESC
+    """, (user_id,))
+
     addresses = cursor.fetchall()
 
     cursor.close()
@@ -1580,17 +1615,21 @@ def add_address():
 # ================= EDIT ADDRESS =================
 @app.route('/edit-address/<int:address_id>', methods=['GET', 'POST'])
 def edit_address(address_id):
+
     if 'user_id' not in session:
         flash("Please login first!", "danger")
         return redirect('/user-login')
 
+    user_id = session['user_id']
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT * FROM addresses WHERE id=? AND user_id=?",
-        (address_id, session['user_id'])
-    )
+    cursor.execute("""
+        SELECT * FROM addresses
+        WHERE id = ? AND user_id = ?
+    """, (address_id, user_id))
+
     address = cursor.fetchone()
 
     if not address:
@@ -1609,18 +1648,9 @@ def edit_address(address_id):
 
         cursor.execute("""
             UPDATE addresses
-            SET full_name=?, phone=?, address=?, city=?, state=?, pincode=?
-            WHERE id=? AND user_id=?
-        """, (
-            full_name,
-            phone,
-            new_address,
-            city,
-            state,
-            pincode,
-            address_id,
-            session['user_id']
-        ))
+            SET full_name = ?, phone = ?, address = ?, city = ?, state = ?, pincode = ?
+            WHERE id = ? AND user_id = ?
+        """, (full_name, phone, new_address, city, state, pincode, address_id, user_id))
 
         conn.commit()
         cursor.close()
@@ -1661,18 +1691,21 @@ def delete_address(address_id):
         """, (address_id, user_id))
 
         conn.commit()
-        flash("Address deleted successfully!", "success")
+
+        if cursor.rowcount > 0:
+            flash("Address deleted successfully!", "success")
+        else:
+            flash("Address not found!", "danger")
 
     except Exception as e:
         conn.rollback()
-        flash(str(e), "danger")
+        flash("Address delete failed!", "danger")
 
     finally:
         cursor.close()
         conn.close()
 
     return redirect('/add-address')
-
 
 # ================= CONTINUE TO PAYMENT =================
 @app.route('/continue-payment/<int:address_id>')
@@ -1828,7 +1861,6 @@ def verify_payment():
 
     try:
         selected_products = [int(pid) for pid in selected_products]
-
         placeholders = ",".join(["?"] * len(selected_products))
 
         query = f"""
@@ -1844,7 +1876,6 @@ def verify_payment():
         """
 
         values = [user_id] + selected_products
-
         cursor.execute(query, values)
         cart_items = cursor.fetchall()
 
@@ -1890,7 +1921,6 @@ def verify_payment():
             WHERE user_id = ?
             AND product_id IN ({placeholders})
         """
-
         cursor.execute(delete_query, values)
 
         conn.commit()
@@ -1905,15 +1935,17 @@ def verify_payment():
     except Exception as e:
         conn.rollback()
         print("ORDER ERROR:", e)
-        flash(str(e), "danger")
+        flash("Order placing failed. Please try again.", "danger")
         return redirect('/user/cart')
 
     finally:
         cursor.close()
         conn.close()
-#================================================================
-# Orders Success
-#===============================================================
+
+
+# ================================================================
+# ORDER SUCCESS
+# ================================================================
 @app.route('/user/order-success/<int:order_id>')
 def order_success(order_id):
 
