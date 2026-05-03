@@ -163,6 +163,12 @@ body{
     border:4px solid #dbeafe;
 }
 
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
 .profile-card h2{
     font-size:24px;
     margin-bottom:8px;
@@ -421,7 +427,11 @@ textarea{
 
         <div class="profile-card">
             <div class="avatar">
-                {{ user.name[0]|upper }}
+                {% if user.profile_image %}
+                    <img src="/static/uploads/user_profiles/{{ user.profile_image }}" alt="Profile Image">
+                {% else %}
+                    {{ user.name[0]|upper }}
+                {% endif %}
             </div>
 
             <h2>{{ user.name }}</h2>
@@ -438,12 +448,12 @@ textarea{
         <div class="form-card">
             <div class="form-header">
                 <h3>Manage Profile</h3>
-                <p>Update your personal details</p>
+                <p>Update your personal details and profile image</p>
             </div>
 
             <div class="form-body">
 
-                <form method="POST" action="/user/profile">
+                <form method="POST" action="/user/profile" enctype="multipart/form-data">
 
                     <div class="form-group">
                         <label>Full Name</label>
@@ -459,6 +469,11 @@ textarea{
                     <div class="form-group">
                         <label>New Password</label>
                         <input type="password" name="password" placeholder="Enter new password if you want to change">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload New Profile Image</label>
+                        <input type="file" name="profile_image">
                     </div>
 
                     <div class="form-group">
