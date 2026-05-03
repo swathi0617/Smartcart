@@ -12,6 +12,8 @@ import traceback
 from utils.pdf_generator import generate_pdf
 
 app = Flask(__name__)
+app.config['USERS_UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads', 'user_profiles')
+os.makedirs(app.config['USERS_UPLOAD_FOLDER'], exist_ok=True)
 
 razorpay_client = razorpay.Client(
     auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
