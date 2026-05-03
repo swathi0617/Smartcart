@@ -13,14 +13,6 @@ from utils.pdf_generator import generate_pdf
 
 app = Flask(__name__)
 
-import os
-
-# User profile images folder
-app.config['USERS_UPLOAD_FOLDER'] = 'static/uploads/user_profiles'
-
-# Folder create automatically
-os.makedirs(app.config['USERS_UPLOAD_FOLDER'], exist_ok=True)
-
 razorpay_client = razorpay.Client(
     auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
 )
@@ -1367,7 +1359,6 @@ def checkout_selected():
     session['selected_products'] = selected_products
 
     return redirect('/add-address')
-
 # ==========================================================
 # USER PROFILE
 # ==========================================================
@@ -1389,13 +1380,7 @@ def user_profile():
     cursor.close()
     conn.close()
 
-    if not user:
-        flash("User not found!", "danger")
-        return redirect('/user-login')
-
     return render_template("user/user_profile.html", user=user)
-
-
 # ==========================================================
 # UPDATE USER PROFILE
 # ==========================================================
@@ -1411,6 +1396,7 @@ def user_profile_update():
     name = request.form.get('name')
     email = request.form.get('email')
     new_password = request.form.get('password')
+    new_image = request.files.get('profile_image')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1424,16 +1410,37 @@ def user_profile_update():
         flash("User not found!", "danger")
         return redirect('/user-login')
 
+    old_image_name = user['profile_image'] if 'profile_image' in user.keys() else ''
+
+    # Password update
     if new_password:
         hashed_password = hash_password(new_password)
     else:
         hashed_password = user['password']
 
+    # Image upload
+    if new_image and new_image.filename != "":
+        from werkzeug.utils import secure_filename
+
+        filename = secure_filename(new_image.filename)
+
+        image_path = os.path.join(app.config['USERS_UPLOAD_FOLDER'], filename)
+        new_image.save(image_path)
+
+        if old_image_name:
+            old_path = os.path.join(app.config['USERS_UPLOAD_FOLDER'], old_image_name)
+            if os.path.exists(old_path):
+                os.remove(old_path)
+
+        final_image_name = filename
+    else:
+        final_image_name = old_image_name
+
     cursor.execute("""
         UPDATE users
-        SET name=?, email=?, password=?
+        SET name=?, email=?, password=?, profile_image=?
         WHERE user_id=?
-    """, (name, email, hashed_password, user_id))
+    """, (name, email, hashed_password, final_image_name, user_id))
 
     conn.commit()
     cursor.close()
