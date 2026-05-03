@@ -13,6 +13,14 @@ from utils.pdf_generator import generate_pdf
 
 app = Flask(__name__)
 
+import os
+
+# User profile images folder
+app.config['USERS_UPLOAD_FOLDER'] = 'static/uploads/user_profiles'
+
+# Folder create automatically
+os.makedirs(app.config['USERS_UPLOAD_FOLDER'], exist_ok=True)
+
 razorpay_client = razorpay.Client(
     auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
 )
@@ -199,18 +207,12 @@ def admin_signup():
 
     flash("OTP sent to your email!", "success")
     return redirect('/verify-reset-otp')
-
-
-
 # ---------------------------------------------------------
 # ROUTE 2: DISPLAY OTP PAGE
 # ---------------------------------------------------------
 @app.route('/verify-reset-otp', methods=['GET'])
 def verify_otp_get():
     return render_template("admin/verify_reset_otp.html")
-
-
-
 # ---------------------------------------------------------
 # ROUTE 3: VERIFY OTP + SAVE ADMIN
 # ---------------------------------------------------------
@@ -247,8 +249,6 @@ def verify_otp_post():
 
     flash("Admin Registered Successfully!", "success")
     return redirect('/admin-signup')
-
-
 # =================================================================
 # ROUTE 4: ADMIN LOGIN PAGE (GET + POST)
 # =================================================================
@@ -289,9 +289,6 @@ def admin_login():
 
     flash("Login Successful!", "success")
     return redirect('/admin-dashboard')
-#==================================================================
-# forgot paaword route
-#==================================================================
 # =============================================================
 # Admin Forgot Password
 # =============================================================
@@ -349,8 +346,6 @@ SmartCart Team
         flash(f"Mail not sent: {e}", "danger")
 
     return redirect('/forgot-password')
-
-
 # =============================================================
 # Admin Reset Password
 # =============================================================
@@ -389,7 +384,6 @@ def reset_password(token):
         return redirect(url_for('admin_login'))
 
     return render_template('admin/reset_password.html', token=token)
-
 # =================================================================
 # ROUTE 5: ADMIN DASHBOARD (PROTECTED ROUTE)
 # =================================================================
@@ -403,9 +397,6 @@ def admin_dashboard():
 
     # Send admin name to dashboard UI
     return render_template("admin/dashboard.html", admin_name=session['admin_name'])
-
-
-
 # =================================================================
 # ROUTE 6: ADMIN LOGOUT
 # =================================================================
@@ -419,12 +410,9 @@ def admin_logout():
 
     flash("Logged out successfully.", "success")
     return redirect('/admin-login')
-
 # ------------------- IMAGE UPLOAD PATH -------------------
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads/product_images')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
 # =================================================================
 # ROUTE 7: SHOW ADD PRODUCT PAGE (Protected Route)
 # =================================================================
@@ -439,8 +427,6 @@ def add_item_page():
         return redirect('/admin-login')
 
     return render_template("admin/add_item.html")
-
-
 # =================================================================
 # ROUTE: ADD PRODUCT INTO DATABASE
 # =================================================================
@@ -516,8 +502,6 @@ def add_item():
 
     flash("Product added successfully!", "success")
     return redirect('/admin/add-item')
-
-
 # =================================================================
 # ROUTE: ADMIN ITEM LIST - ONLY CURRENT ADMIN PRODUCTS
 # =================================================================
@@ -735,14 +719,11 @@ def delete_item(item_id):
 
     flash("Product deleted successfully!", "success")
     return redirect('/admin/item-list')
-
-
 #==========================================================
 # add admin profile
 #==========================================================
 ADMIN_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static/uploads/admin_profiles')
 app.config['ADMIN_UPLOAD_FOLDER'] = ADMIN_UPLOAD_FOLDER
-
 # =================================================================
 # ROUTE 1: SHOW ADMIN PROFILE DATA
 # =================================================================
@@ -765,8 +746,6 @@ def admin_profile():
     conn.close()
 
     return render_template("admin/admin_profile.html", admin=admin)
-
-
 # =================================================================
 # ROUTE 2: UPDATE ADMIN PROFILE (NAME, EMAIL, PASSWORD, IMAGE)
 # =================================================================
@@ -837,7 +816,6 @@ def admin_profile_update():
 
     flash("Profile updated successfully!", "success")
     return redirect('/admin/profile')
-
 # =================================================================
 # ROUTE: USER REGISTRATION
 # =================================================================
@@ -877,7 +855,6 @@ def user_register():
 
     flash("Registration successful! Please login.", "success")
     return redirect('/user-login')
-
 # =================================================================
 # USER LOGIN
 # =================================================================
@@ -1038,9 +1015,6 @@ def user_reset_password_page(token):
 
     return render_template("user/verify_reset_otp.html")
 # =================================================================
-# ROUTE: USER DASHBOARD
-# =================================================================
-# =================================================================
 # USER DASHBOARD
 # =================================================================
 @app.route('/user-dashboard')
@@ -1162,7 +1136,6 @@ def user_products():
         products=products,
         categories=categories
     )
-
 # =================================================================
 # ROUTE: USER PRODUCT DETAILS PAGE
 # =================================================================
@@ -1187,10 +1160,6 @@ def user_product_details(product_id):
         return redirect('/user/products')
 
     return render_template("user/product_details.html", product=product)
-
-# =================================================================
-# ADD ITEM TO CART
-# =================================================================
 # =================================================================
 # ADD TO CART
 # =================================================================
@@ -1398,9 +1367,7 @@ def checkout_selected():
     session['selected_products'] = selected_products
 
     return redirect('/add-address')
-# ==========================================================
-# SHOW USER PROFILE
-# ==========================================================
+
 # ==========================================================
 # USER PROFILE
 # ==========================================================
@@ -1422,6 +1389,10 @@ def user_profile():
     cursor.close()
     conn.close()
 
+    if not user:
+        flash("User not found!", "danger")
+        return redirect('/user-login')
+
     return render_template("user/user_profile.html", user=user)
 
 
@@ -1440,7 +1411,6 @@ def user_profile_update():
     name = request.form.get('name')
     email = request.form.get('email')
     new_password = request.form.get('password')
-    new_image = request.files.get('profile_image')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -1454,37 +1424,16 @@ def user_profile_update():
         flash("User not found!", "danger")
         return redirect('/user-login')
 
-    old_image_name = user['profile_image'] if 'profile_image' in user.keys() else ''
-
-    # Password update
     if new_password:
         hashed_password = hash_password(new_password)
     else:
         hashed_password = user['password']
 
-    # Image upload
-    if new_image and new_image.filename != "":
-        from werkzeug.utils import secure_filename
-
-        filename = secure_filename(new_image.filename)
-
-        image_path = os.path.join(app.config['USERS_UPLOAD_FOLDER'], filename)
-        new_image.save(image_path)
-
-        if old_image_name:
-            old_path = os.path.join(app.config['USERS_UPLOAD_FOLDER'], old_image_name)
-            if os.path.exists(old_path):
-                os.remove(old_path)
-
-        final_image_name = filename
-    else:
-        final_image_name = old_image_name
-
     cursor.execute("""
         UPDATE users
-        SET name=?, email=?, password=?, profile_image=?
+        SET name=?, email=?, password=?
         WHERE user_id=?
-    """, (name, email, hashed_password, final_image_name, user_id))
+    """, (name, email, hashed_password, user_id))
 
     conn.commit()
     cursor.close()
