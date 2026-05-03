@@ -514,7 +514,15 @@ def item_list():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Only logged-in admin products
+    # ✅ Old products ki admin_id NULL unte current admin ki assign chestundi
+    cursor.execute("""
+        UPDATE products
+        SET admin_id = ?
+        WHERE admin_id IS NULL
+    """, (admin_id,))
+    conn.commit()
+
+    # ✅ Only logged-in admin products
     query = """
         SELECT *
         FROM products
@@ -535,7 +543,7 @@ def item_list():
     cursor.execute(query, values)
     products = cursor.fetchall()
 
-    # Only logged-in admin categories
+    # ✅ Only logged-in admin categories
     cursor.execute("""
         SELECT DISTINCT category
         FROM products
