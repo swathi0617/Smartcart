@@ -506,23 +506,26 @@ def item_list():
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
-    # GET values
+    admin_id = session['admin_id']
+
     search = request.args.get('search', '').strip()
     category = request.args.get('category', '').strip()
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Base query - all products
-    query = "SELECT * FROM products WHERE 1=1"
-    values = []
+    # Only logged-in admin products
+    query = """
+        SELECT *
+        FROM products
+        WHERE admin_id = ?
+    """
+    values = [admin_id]
 
-    # Search filter
     if search:
         query += " AND name LIKE ?"
         values.append(f"%{search}%")
 
-    # Category filter
     if category:
         query += " AND category = ?"
         values.append(category)
@@ -532,14 +535,16 @@ def item_list():
     cursor.execute(query, values)
     products = cursor.fetchall()
 
-    # Categories dropdown - all categories
+    # Only logged-in admin categories
     cursor.execute("""
         SELECT DISTINCT category
         FROM products
-        WHERE category IS NOT NULL
+        WHERE admin_id = ?
+        AND category IS NOT NULL
         AND category != ''
         ORDER BY category
-    """)
+    """, (admin_id,))
+
     categories = cursor.fetchall()
 
     cursor.close()
